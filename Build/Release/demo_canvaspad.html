@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<title>Textor for HTML5</title>
+<script type="text/javascript" src="texteditor.js"></script>
+<script type="text/javascript" src="javascript.js"></script>
+<style type="text/css">
+body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
+#canvas       { background: #000000; padding: 0px; border: 1px solid #444a54; margin-bottom: 12px; float: left; }
+#editor       { background: #000000; padding: 0px; border: 1px solid #444a54; border-left: none; }
+#editor.focus { background: #22252a; outline: none; }
+</style>
+<script type="text/javascript">
+//<![CDATA[
+
+var content = '\
+context.strokeStyle = "#fff";\n\
+\n\
+// draw matrix of rounded rectangles\n\
+context.lineWidth = 2;\n\
+context.fillStyle = "#fff";\n\
+for (var i = 0; i < 4; i++)\n\
+{\n\
+	for (var j = 0; j < 4; j++)\n\
+	{\n\
+		roundedRect(135 + 60 * i, 135 + 60 * j, 50, 50, 10);\n\
+		if (i % 4 == j)\n\
+		{\n\
+			context.fill();\n\
+		}\n\
+		context.stroke();\n\
+	}\n\
+}\n\
+\n\
+function roundedRect(x, y, width, height, radius)\n\
+{\n\
+	context.beginPath();\n\
+	context.moveTo(x + radius, y);\n\
+	context.lineTo(x + width - radius, y);\n\
+	context.quadraticCurveTo(x + width, y, x + width, y + radius);\n\
+	context.lineTo(x + width, y + height - radius);\n\
+	context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);\n\
+	context.lineTo(x + radius, y + height);\n\
+	context.quadraticCurveTo(x, y + height, x, y + height - radius);\n\
+	context.lineTo(x, y + radius);\n\
+	context.quadraticCurveTo(x, y, x + radius, y);\n\
+	context.closePath();\n\
+}';
+
+var editor = null;
+
+function document_load()
+{
+	editor = new TextEditor(document.getElementById("editor"));
+	editor.setLanguage(new JavaScript());
+	editor.setTheme({ 
+		"font-family": "Menlo,Lucida Console,Courier New", 
+		"font-size": "13", 
+		"background-color": "#22252A",
+		"background-blur-color": "#000000",
+		"selection-color": "#3C424C", 
+		"selection-blur-color": "#33373F", 
+		"cursor-color": "#FFFFFF", 
+		"cursor-background-color": "#33373F",
+		"text-style": "#FFFFFF", 
+		"comment-style": "#AAAAAA italic",
+		"literal-style": "#997777",
+		"keyword-style": "#82A0C0",
+		"punctuation-style": "#888888",
+		"declaration-style": "#FFFFFF italic",
+		"error-style": "AA0000 bold" });
+	editor.focus();
+	editor.textChanged.add(update);
+	editor.setText(content);
+}
+
+var canvas = null;
+var context = null;
+
+function update()
+{
+	if (context === null)
+	{
+		canvas = document.getElementById("canvas");
+		context = canvas.getContext("2d");
+	}
+	
+	context.save();
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	try
+	{
+		window.eval(editor.getText());
+	}
+	catch (exception)
+	{
+		context.font = "bold 13px Menlo,Lucida Console,Courier New";
+		context.fillStyle = "#a00";
+		context.fillText(exception.toString(), 8, 18);
+	}	
+	context.restore();
+}
+
+//]]>
+</script>
+
+</head>
+
+<body onload="document_load()">
+<br/>
+<br/>
+<div style="margin-left: auto; margin-right: auto; width: 1020px;">
+<canvas id="canvas" width="500" height="500"></canvas>
+<canvas id="editor" width="500" height="500" tabindex="1"></canvas>
+</div>
+</body>
+
+</html>

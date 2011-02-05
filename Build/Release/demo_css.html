@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Textor CSS Sample</title>
+<style type="text/css">
+body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
+#editor       { background: #000000; padding: 0px; border: 1px solid #404040; }
+</style>
+<script type="text/javascript" src="texteditor.js"></script>
+<script type="text/javascript" src="css.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+
+var content = "\
+@import url('foo.css');\n\
+\n\
+@media print\n\
+{\n\
+	/* comment */\n\
+	h1 { font-family: 'Verdana' }\n\
+}\n\
+\n\
+@media screen {  /* hide from IE3 */\n\
+	a[href]:hover { background: #ffa }\n\
+}\n\
+\n\
+html { -webkit-text-size-adjust: none; }\n\
+\n\
+a:active {\n\
+	font-size:2px;\n\
+}\n\
+\n\
+/* comment */\n\
+div { padding: 10px; }\n\
+\n\
+.class { position: absolute; /* comment */ top: 18px; left: 18px; width: 175px; padding: 10px; background-color:#000; color:#fff; }\n\
+.element { width: 500px; margin-left: 215px; }\n\
+\n\
+BDO[DIR='rtl'] { direction: rtl; unicode-bidi: bidi-override }\n\
+*[DIR='ltr'] { direction: ltr; unicode-bidi: embed }\n\
+\n\
+body {\n\
+	background-image: url(http://www.w3.org/StyleSheets/TR/logo-WD);\n\
+}\n\
+";
+
+function document_load()
+{
+	var editor = new TextEditor(document.getElementById("editor"));
+	editor.setTheme({ 
+		"font-family": "Menlo,Lucida Console,Courier New", 
+		"font-size": "13", 
+		"background-color": "#202020",
+		"background-blur-color": "#000000",
+		"selection-color": "#383838", 
+		"selection-blur-color": "#282828", 
+		"cursor-color": "#FFFFFF", 
+		"cursor-background-color": "#333333",
+		"text-style": "#FFFFFF", 
+		"comment-style": "#AAAAAA italic",
+		"literal-style": "#998888",
+		"keyword-style": "#808880 bold",
+		"punctuation-style": "#888888",
+		"declaration-style": "#FFFFFF italic",
+		"attribute-style": "#AAAAAA bold",
+		"element-style": "#CCCCCC bold",
+		"error-style": "#AA0000 bold" });
+	editor.setLanguage(new Css());
+	editor.focus();
+	editor.setText(content);
+}
+//]]>
+</script>
+</head>
+<body onload="document_load();">
+<br/>
+<br/>
+<div style="margin-left: auto; margin-right: auto; width: 1024px; height:500px;">
+<canvas id="editor" width="1024" height="500" tabindex="1"></canvas>
+</div>
+</body>
+</html>
