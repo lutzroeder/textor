@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>Textor CSS Sample</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
 <style type="text/css">
 body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
 #editor       { background: #000000; padding: 0px; border: 1px solid #404040; }
@@ -47,28 +48,28 @@ body {\n\
 
 function document_load()
 {
-	var editor = new TextEditor(document.getElementById("editor"));
-	editor.setTheme({ 
-		"font-family": "Menlo,Lucida Console,Courier New", 
-		"font-size": "13", 
-		"background-color": "#202020",
-		"background-blur-color": "#000000",
-		"selection-color": "#383838", 
-		"selection-blur-color": "#282828", 
-		"cursor-color": "#FFFFFF", 
-		"cursor-background-color": "#333333",
-		"text-style": "#FFFFFF", 
-		"comment-style": "#AAAAAA italic",
-		"literal-style": "#998888",
-		"keyword-style": "#808880 bold",
-		"punctuation-style": "#888888",
-		"declaration-style": "#FFFFFF italic",
-		"attribute-style": "#AAAAAA bold",
-		"element-style": "#CCCCCC bold",
-		"error-style": "#AA0000 bold" });
-	editor.setLanguage(new Css());
+	var editor = new Textor.TextEditor(document.getElementById("editor"));
+	editor.language = new Textor.CssLanguage();
+	editor.theme = { 
+		"fontFamily": "Menlo,Lucida Console,Courier New", 
+		"fontSize": "13", 
+		"backgroundColor": "#202020",
+		"backgroundBlurColor": "#000000",
+		"selectionColor": "#383838", 
+		"selectionBlurColor": "#282828", 
+		"cursorColor": "#FFFFFF", 
+		"cursorBackgroundColor": "#333333",
+		"textStyle": "#FFFFFF", 
+		"commentStyle": "#AAAAAA italic",
+		"literalStyle": "#998888",
+		"keywordStyle": "#808880 bold",
+		"punctuationStyle": "#888888",
+		"declarationStyle": "#FFFFFF italic",
+		"attributeStyle": "#AAAAAA bold",
+		"elementStyle": "#CCCCCC bold",
+		"errorStyle": "#AA0000 bold" };
 	editor.focus();
-	editor.setText(content);
+	editor.text = content;
 }
 //]]>
 </script>

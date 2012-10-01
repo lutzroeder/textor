@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>Textor HTML Sample</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
 <style type="text/css">
 body    { background: #fff; margin-left: 0; margin-right: 0; margin-top: 0; }
 #editor { background: #fff; border: 1px solid #444; }
@@ -15,8 +16,8 @@ body    { background: #fff; margin-left: 0; margin-right: 0; margin-top: 0; }
 //<![CDATA[
 function document_load()
 {
-	var editor = new TextEditor(document.getElementById("editor"));
-	editor.setLanguage(new Html({ "text/css": new Css(), "text/javascript": new JavaScript() }));
+	var editor = new Textor.TextEditor(document.getElementById("editor"));
+	editor.language = new Textor.HtmlLanguage({ "text/css": new Textor.CssLanguage(), "text/javascript": new Textor.JavaScriptLanguage() });
 	editor.focus();
 
 	var request = new XMLHttpRequest()
@@ -25,7 +26,7 @@ function document_load()
 	{
 		if (request.readyState === 4)
 		{
-			editor.setText(request.responseText);
+			editor.text = request.responseText;
 		}
 	}
 	request.send(null);

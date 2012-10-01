@@ -1,66 +1,39 @@
 #!/bin/bash
 
-rm -r ../Build
-mkdir ../Build
-mkdir ../Build/Debug
-mkdir ../Build/Release
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-pushd ../Samples > /dev/null
-cp demo_canvaspad.html ../Build/Debug/
-cp demo_canvaspad.html ../Build/Release/
-cp demo_javascript.html ../Build/Debug/
-cp demo_javascript.html ../Build/Release/
-cp demo_html.html ../Build/Debug/
-cp demo_html.html ../Build/Release/
-cp demo_css.html ../Build/Debug/
-cp demo_css.html ../Build/Release/
-popd > /dev/null
+rm -f -r ../Build
+mkdir -p ../Build/Debug
+mkdir -p ../Build/Release
+
+cp ../Samples/demo_canvaspad.html ../Build/Debug/
+cp ../Samples/demo_canvaspad.html ../Build/Release/
+cp ../Samples/demo_javascript.html ../Build/Debug/
+cp ../Samples/demo_javascript.html ../Build/Release/
+cp ../Samples/demo_html.html ../Build/Debug/
+cp ../Samples/demo_html.html ../Build/Release/
+cp ../Samples/demo_css.html ../Build/Debug/
+cp ../Samples/demo_css.html ../Build/Release/
 
 echo Building \'Debug/texteditor.js\'.
-pushd ../Source/TextEditor > /dev/null
-cat	Function.js \
-	Array.js \
-	Event.js \
-	Point.js \
-	Size.js \
-	Rectangle.js \
-	TextPosition.js \
-	TextRange.js \
-	ContainerUndoUnit.js \
-	SelectionUndoUnit.js \
-	TextUndoUnit.js \
-	UndoService.js \
-	TextReader.js \
-	LanguageService.js \
-	TextBuffer.js \
-	TextModel.js \
-	TextController.js \
-	TextEditor.js \
-	> ../../Build/Debug/texteditor.js
-popd > /dev/null
+node tsc.js -target ES5 -out ../Build/Debug/texteditor.js lib.d.ts libex.ts ../Source/TextEditor/*.ts
 
+if [ -f ../Build/Debug/texteditor.js ]; then
 echo Building \'Debug/javascript.js\'.
-pushd ../Source/JavaScript > /dev/null
-cat	JavaScript.js > ../../Build/Debug/javascript.js
-popd > /dev/null
-
+node tsc.js -target ES5 -out ../Build/Debug/javascript.js lib.d.ts ../Source/JavaScript/*.ts
 echo Building \'Debug/css.js\'.
-pushd ../Source/Css > /dev/null
-cat	Css.js > ../../Build/Debug/css.js
-popd > /dev/null
-
+node tsc.js -target ES5 -out ../Build/Debug/css.js lib.d.ts ../Source/Css/*.ts
 echo Building \'Debug/html.js\'.
-pushd ../Source/Html > /dev/null
-cat	Html.js > ../../Build/Debug/html.js
-popd > /dev/null
+node tsc.js -target ES5 -out ../Build/Debug/html.js lib.d.ts ../Source/Html/*.ts
+fi
 
-echo Building \'Release/texteditor.js\'.
-java -jar compiler.jar --js ../Build/Debug/texteditor.js > ../Build/Release/texteditor.js
+echo Building \'Release/textditor.js\'.
+node minify.js ../Build/Debug/texteditor.js ../Build/Release/texteditor.js
 echo Building \'Release/css.js\'.
-java -jar compiler.jar --js ../Build/Debug/css.js > ../Build/Release/css.js
+node minify.js ../Build/Debug/css.js ../Build/Release/css.js
 echo Building \'Release/javascript.js\'.
-java -jar compiler.jar --js ../Build/Debug/javascript.js > ../Build/Release/javascript.js
+node minify.js ../Build/Debug/javascript.js ../Build/Release/javascript.js
 echo Building \'Release/html.js\'.
-java -jar compiler.jar --js ../Build/Debug/html.js > ../Build/Release/html.js
+node minify.js ../Build/Debug/html.js ../Build/Release/html.js
 
 echo Done.

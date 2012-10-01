@@ -1,370 +1,329 @@
+var Textor;
+(function (Textor) {
+    var HtmlLanguage = (function () {
+        function HtmlLanguage(languages) {
+            this._tokenStack = [];
+            this._languages = languages;
+        }
+        HtmlLanguage.prototype.begin = function (textReader, state) {
+            this._textReader = textReader;
+            this._tokenStack = [
+                {
+                    type: this.readText
+                }
+            ];
+            this._languageToken = null;
+            if(state !== null) {
+                var states = state.split(':');
+                if(states.length > 1) {
+                    var mimeType = states[0];
+                    var closeTag = states[1];
+                    var language = this._languages[mimeType];
+                    if(language) {
+                        language.begin(this._textReader, states[2]);
+                        this.push({
+                            type: this.readLanguage,
+                            mimeType: mimeType,
+                            language: language,
+                            closeTag: closeTag,
+                            contentData: 0
+                        });
+                    }
+                }
+            }
+        };
+        HtmlLanguage.prototype.read = function () {
+            this._state = null;
+            this._token = this._tokenStack[this._tokenStack.length - 1];
+            if(this._token.type === this.readLanguage) {
+                return this._token.type.apply(this);
+            }
+            return {
+                style: this._token.type.apply(this),
+                state: this._state
+            };
+        };
+        HtmlLanguage.prototype.readText = function () {
+            if(this._textReader.match('<')) {
+                if(this._tokenStack.length === 1) {
+                    this._state = 'base';
+                }
+                if(this._textReader.match('!')) {
+                    if(this._textReader.match('--')) {
+                        this.push({
+                            type: this.readComment
+                        });
+                        return 'comment';
+                    } else {
+                        if(this._textReader.match('[CDATA[')) {
+                            this.push({
+                                type: this.readConstantData
+                            });
+                            return 'literal';
+                        } else {
+                            this.push({
+                                type: this.readDocType
+                            });
+                            return 'punctuation';
+                        }
+                    }
+                } else {
+                    if(this._textReader.match('?')) {
+                        this.push({
+                            type: this.readProcessingInstruction
+                        });
+                        return 'punctuation';
+                    } else {
+                        if(this._textReader.match('/')) {
+                            this.push({
+                                type: this.readEndTag
+                            });
+                            return 'punctuation';
+                        } else {
+                            this.push({
+                                type: this.readStartTag,
+                                name: '',
+                                hasAttributes: false
+                            });
+                            return 'punctuation';
+                        }
+                    }
+                }
+            } else {
+                if(this._textReader.match('&')) {
+                    this.push({
+                        type: this.readEntity
+                    });
+                    return 'literal';
+                }
+            }
+            this._textReader.read();
+            return 'text';
+        };
+        HtmlLanguage.prototype.readStartTag = function () {
+            if(this._textReader.skipWhitespaces()) {
+                this._token.hasAttributes = true;
+                this.push({
+                    type: this.readAttribute,
+                    name: '',
+                    hasValue: false
+                });
+                return 'text';
+            }
+            if(this._textReader.match('>') || (this._textReader.match('/>'))) {
+                this.pop();
+                this.setLanguage();
+                return 'punctuation';
+            }
+            var c = this._textReader.read();
+            if(!this._token.hasAttributes) {
+                this._token.name += c;
+            }
+            return 'element';
+        };
+        HtmlLanguage.prototype.readEndTag = function () {
+            if(this._textReader.match('>')) {
+                this.pop();
+                return 'punctuation';
+            }
+            this._token.name += this._textReader.read();
+            return 'element';
+        };
+        HtmlLanguage.prototype.readAttribute = function () {
+            if(this._textReader.skipWhitespaces()) {
+                return 'text';
+            } else {
+                if(this._textReader.match('>')) {
+                    this.pop();
+                    this.pop();
+                    this.setLanguage();
+                    return 'punctuation';
+                } else {
+                    if(this._textReader.match('=')) {
+                        this.push({
+                            type: this.readAttributeValue,
+                            value: '',
+                            quote: ''
+                        });
+                        this._token.hasValue = true;
+                        return 'punctuation';
+                    }
+                }
+            }
+            var c = this._textReader.peek();
+            if(c === '/') {
+                this.pop();
+                return 'punctuation';
+            }
+            this._textReader.read();
+            if(!this._token.hasValue) {
+                this._token.name += c;
+            }
+            return 'attribute';
+        };
+        HtmlLanguage.prototype.readAttributeValue = function () {
+            var c = this._textReader.peek();
+            if(this._token.quote === '') {
+                if(c === "'") {
+                    this._textReader.read();
+                    this._token.quote = 's';
+                    return 'literal';
+                } else {
+                    if(c === '"') {
+                        this._textReader.read();
+                        this._token.quote = 'd';
+                        return 'literal';
+                    } else {
+                        if(this._textReader.skipWhitespaces()) {
+                            return 'text';
+                        } else {
+                            this._token.quote = '-';
+                        }
+                    }
+                }
+            }
+            var closeTag = false;
+            var style = '';
+            if(this._token.quote === 's' && c === "'") {
+                this._textReader.read();
+                this.pop();
+                style = 'literal';
+            } else {
+                if(this._token.quote === 'd' && c === '"') {
+                    this._textReader.read();
+                    this.pop();
+                    style = 'literal';
+                } else {
+                    if(this._token.quote === '-' && this._textReader.skipWhitespaces()) {
+                        this.pop();
+                        style = 'text';
+                    } else {
+                        if(this._token.quote === '-' && c === '>') {
+                            this._textReader.read();
+                            this.pop();
+                            closeTag = true;
+                            style = 'punctuation';
+                        }
+                    }
+                }
+            }
+            if(style.length === 0) {
+                this._token.value += this._textReader.read();
+                return 'literal';
+            }
+            var attributeName = this._tokenStack[this._tokenStack.length - 1].name.toUpperCase();
+            var elementName = this._tokenStack[this._tokenStack.length - 2].name.toUpperCase();
+            if((attributeName === 'TYPE' && elementName === 'SCRIPT') || (attributeName === 'TYPE' && elementName === 'STYLE')) {
+                var mimeType = this._token.value;
+                var language = this._languages[mimeType];
+                if(language) {
+                    language.begin(this._textReader, null);
+                    this._languageToken = {
+                        type: this.readLanguage,
+                        mimeType: mimeType,
+                        language: language,
+                        closeTag: '</' + elementName + '>',
+                        contentData: 0
+                    };
+                }
+            }
+            this.pop();
+            if(closeTag) {
+                this.pop();
+                this.setLanguage();
+            } else {
+                this.push({
+                    type: this.readAttribute,
+                    name: '',
+                    value: false
+                });
+            }
+            return style;
+        };
+        HtmlLanguage.prototype.readComment = function () {
+            this.terminate('-->');
+            return 'comment';
+        };
+        HtmlLanguage.prototype.readConstantData = function () {
+            this.terminate(']]>');
+            return 'literal';
+        };
+        HtmlLanguage.prototype.readEntity = function () {
+            var c = this._textReader.read();
+            if((c === '\n') || (c === ';')) {
+                this.pop();
+            }
+            return 'literal';
+        };
+        HtmlLanguage.prototype.readDocType = function () {
+            return this.terminate('>') ? 'punctuation' : 'element';
+        };
+        HtmlLanguage.prototype.readProcessingInstruction = function () {
+            return this.terminate('?>') ? 'punctuation' : 'literal';
+        };
+        HtmlLanguage.prototype.readLanguage = function () {
+            var c = this._textReader.peek();
+            if(c === '<' || c === ']') {
+                if(this.testIgnoreCase('<![CDATA[')) {
+                    this._token.contentData++;
+                } else {
+                    if(this.testIgnoreCase(']]>') && (this._token.contentData > 0)) {
+                        this._token.contentData--;
+                    }
+                }
+                if((this._token.contentData == 0) && this.testIgnoreCase(this._token.closeTag)) {
+                    this.pop();
+                    return this.read();
+                }
+            }
+            var result = this._token.language.read();
+            result.state = (result.state !== null) ? (this._token.mimeType + ':' + this._token.closeTag + ':' + result.state) : null;
+            return result;
+        };
+        HtmlLanguage.prototype.push = function (token) {
+            this._tokenStack.push(token);
+        };
+        HtmlLanguage.prototype.pop = function () {
+            this._tokenStack.pop();
+        };
+        HtmlLanguage.prototype.setLanguage = function () {
+            if(this._languageToken !== null) {
+                this.push(this._languageToken);
+                this._languageToken = null;
+            }
+        };
+        HtmlLanguage.prototype.terminate = function (terminator) {
+            if(this._textReader.match(terminator)) {
+                this.pop();
+                return true;
+            }
+            this._textReader.read();
+            return false;
+        };
+        HtmlLanguage.prototype.testIgnoreCase = function (text) {
+            this._textReader.save();
+            for(var i = 0; i < text.length; i++) {
+                var c = this._textReader.read();
+                if((c.length === 0) || (c.toUpperCase() !== text[i].toUpperCase())) {
+                    this._textReader.restore();
+                    return false;
+                }
+            }
+            this._textReader.restore();
+            return true;
+        };
+        return HtmlLanguage;
+    })();
+    Textor.HtmlLanguage = HtmlLanguage;    
+})(Textor || (Textor = {}));
 
-var Html = function()
-{
-	if (arguments.length === 0)
-	{
-		this.languages = [];
-	}
-	if (arguments.length === 1)
-	{
-		// mixed content languages by mime-type
-		this.languages = arguments[0];
-	}
-};
+var Textor;
+(function (Textor) {
+    
+})(Textor || (Textor = {}));
 
-Html.prototype.begin = function(textReader, state)
-{
-	this.textReader = textReader;
-	this.tokenStack = [{ type: this.readText }];
+var Textor;
+(function (Textor) {
+    
+})(Textor || (Textor = {}));
 
-	// used for mixed content in JavaScript or CSS
-	this.languageToken = null;
-
-	if (state !== null)
-	{
-		var states = state.split(':');
-		if (states.length > 1)
-		{
-			var mimeType = states[0];
-			var closeTag = states[1];
-			var language = this.languages[mimeType];
-			if (language)
-			{
-				language.begin(this.textReader, states[2]);
-				this.push({ type: this.readLanguage, mimeType: mimeType, language: language, closeTag: closeTag, contentData: 0 });
-			}
-		}
-	}
-};
-
-Html.prototype.read = function()
-{
-	this.state = null;
-	this.token = this.tokenStack[this.tokenStack.length - 1];
-	if (this.token.type === this.readLanguage)
-	{
-		return this.token.type.apply(this);
-	}
-	return { style: this.token.type.apply(this), state: this.state };
-};
-
-Html.prototype.readText = function()
-{
-	if (this.textReader.match('<'))
-	{
-		if (this.tokenStack.length === 1)
-		{
-			this.state = 'base';
-		}
-		if (this.textReader.match('!'))
-		{
-			if (this.textReader.match('--'))
-			{
-				// comment
-				this.push({ type: this.readComment });
-				return 'comment';
-			}
-			else if (this.textReader.match('[CDATA['))
-			{
-				// constant data
-				this.push({ type: this.readConstantData });
-				return 'literal';
-			}
-			else
-			{
-				// doc type
-				this.push({ type: this.readDocType });
-				return 'punctuation';
-			}
-		}
-		else if (this.textReader.match('?'))
-		{
-			// processing instruction
-			this.push({ type: this.readProcessingInstruction });
-			return 'punctuation';
-		}
-		else if (this.textReader.match('/'))
-		{
-			// close tag
-			this.push({ type: this.readEndTag });
-			return 'punctuation';
-		}
-		else
-		{
-			// open tag
-			this.push({ type: this.readStartTag, name: '', hasAttributes: false });
-			return 'punctuation';
-		}
-	}
-	else if (this.textReader.match('&'))
-	{
-		// entity
-		this.push({ type: this.readEntity });
-		return 'literal';
-	}
-	this.textReader.read();
-	return 'text';
-};
-
-Html.prototype.readStartTag = function()
-{
-	if (this.textReader.skipWhitespaces())
-	{
-		this.token.hasAttributes = true;
-		this.push({ type: this.readAttribute, name: '', hasValue: false });
-		return 'text';
-	}
-	if (this.textReader.match('>') || (this.textReader.match('/>')))
-	{
-		this.pop();
-		this.setLanguage();
-		return 'punctuation';
-	}
-	c = this.textReader.read();
-	if (!this.token.hasAttributes)
-	{
-		this.token.name += c;
-	}
-	return 'element';
-};
-
-Html.prototype.readEndTag = function()
-{
-	if (this.textReader.match('>'))
-	{
-		this.pop();
-		return 'punctuation';
-	}
-	this.token.name += this.textReader.read();
-	return 'element';
-};
-
-Html.prototype.readAttribute = function()
-{
-	if (this.textReader.skipWhitespaces())
-	{
-		return 'text';
-	}
-	else if (this.textReader.match('>'))
-	{
-		this.pop();
-		this.pop();
-		this.setLanguage();
-		return 'punctuation';
-	}
-	else if (this.textReader.match('='))
-	{
-		this.push({ type: this.readAttributeValue, value: '', quote: '' });
-		this.token.hasValue = true;
-		return 'punctuation';
-	}
-	c = this.textReader.peek();
-	if (c === '/')
-	{
-		this.pop();
-		return 'punctuation';
-	}
-	this.textReader.read();
-	if (!this.token.hasValue)
-	{
-		this.token.name += c;
-	}
-	return 'attribute';
-};
-
-Html.prototype.readAttributeValue = function()
-{
-	c = this.textReader.peek();
-	if (this.token.quote === '')
-	{
-		if (c === "'")
-		{
-			this.textReader.read();
-			this.token.quote = 's'; // single-quote
-			return 'literal';
-		}
-		else if (c === '"')
-		{
-			this.textReader.read();
-			this.token.quote = 'd'; // double-quote
-			return 'literal';
-		}
-		else if (this.textReader.skipWhitespaces())
-		{
-			return 'text';
-		}
-		else
-		{
-			this.token.quote = '-'; // none
-		}
-	}
-
-	var closeTag = false;
-	var style = '';
-
-	if (this.token.quote === 's' && c === "'")
-	{
-		this.textReader.read();
-		this.pop();
-		style = 'literal';
-	}
-	else if (this.token.quote === 'd' && c === '"')
-	{
-		this.textReader.read();
-		this.pop();
-		style = 'literal';
-	}
-	else if (this.token.quote === '-' && this.textReader.skipWhitespaces())
-	{
-		this.pop();
-		style = 'text';
-	}
-	else if (this.token.quote === '-' && c === '>')
-	{
-		this.textReader.read();
-		this.pop();
-		closeTag = true;
-		style = 'punctuation';
-	}
-
-	if (style.length === 0)
-	{
-		this.token.value += this.textReader.read();
-		return 'literal';
-	}
-
-	// check if element has mixed content
-	attributeName = this.tokenStack[this.tokenStack.length - 1].name.toUpperCase();
-	elementName = this.tokenStack[this.tokenStack.length - 2].name.toUpperCase();
-	if ((attributeName === 'TYPE' && elementName === 'SCRIPT') || (attributeName === 'TYPE' && elementName === 'STYLE'))
-	{
-		var mimeType = this.token.value;
-		var language = this.languages[mimeType];
-		if (language)
-		{
-			language.begin(this.textReader, null);
-			this.languageToken = { type: this.readLanguage, mimeType: mimeType, language: language, closeTag: '</' + elementName + '>', contentData: 0 };
-		}
-	}
-
-	// pop attribute
-	this.pop();
-	if (closeTag)
-	{
-		// pop start tag
-		this.pop();
-		this.setLanguage();
-	}
-	else
-	{
-		// next attribute
-		this.push({ type: this.readAttribute, name: '', value: false });
-	}
-
-	return style;
-};
-
-Html.prototype.readComment = function()
-{
-	this.terminate('-->');
-	return 'comment';
-};
-
-Html.prototype.readConstantData = function()
-{
-	this.terminate(']]>');
-	return 'literal';
-};
-
-Html.prototype.readEntity = function()
-{
-	c = this.textReader.read();
-	if ((c === '\n') || (c === ';'))
-	{
-		this.pop();
-	}
-	return 'literal';
-};
-
-Html.prototype.readDocType = function()
-{
-	return this.terminate('>') ? 'punctuation' : 'element';
-};
-
-Html.prototype.readProcessingInstruction = function()
-{
-	return this.terminate('?>') ? 'punctuation' : 'literal';
-};
-
-Html.prototype.readLanguage = function()
-{
-	c = this.textReader.peek();
-	if (c === '<' || c === ']')
-	{
-		if (this.testIgnoreCase('<![CDATA['))
-		{
-			this.token.contentData++;
-		}
-		else if (this.testIgnoreCase(']]>') && (this.token.contentData > 0))
-		{
-			this.token.contentData--;
-		}
-
-		// check for </style> or </script> end tag.
-		if ((this.token.contentData == 0) && this.testIgnoreCase(this.token.closeTag))
-		{
-			this.pop();
-			return this.read();
-		}
-	}
-
-	var result = this.token.language.read();
-	result.state = (result.state !== null) ? (this.token.mimeType + ':' + this.token.closeTag + ':' + result.state) : null;
-	return result;
-};
-
-Html.prototype.push = function(token)
-{
-	this.tokenStack.push(token);
-};
-
-Html.prototype.pop = function()
-{
-	this.tokenStack.pop();
-};
-
-Html.prototype.setLanguage = function()
-{
-	if (this.languageToken !== null)
-	{
-		this.push(this.languageToken);
-		this.languageToken = null;
-	}
-};
-
-Html.prototype.terminate = function(terminator)
-{
-	if (this.textReader.match(terminator))
-	{
-		this.pop();
-		return true;
-	}
-	this.textReader.read();
-	return false;
-};
-
-Html.prototype.testIgnoreCase = function(text)
-{
-	this.textReader.save();
-	for (var i = 0; i < text.length; i++)
-	{
-		c = this.textReader.read();
-		if ((c === -1) || (c.toUpperCase() !== text[i].toUpperCase()))
-		{
-			this.textReader.restore();
-			return false;
-		}
-	}
-	this.textReader.restore();
-	return true;
-};

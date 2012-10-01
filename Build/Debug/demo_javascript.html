@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>Textor JavaScript Sample</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
 <style type="text/css">
 body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
 #editor       { background: #000000; padding: 0px; border: 1px solid #444a54; }
@@ -14,24 +15,24 @@ body          { background: #000000; margin-left: 0; margin-right: 0; margin-top
 //<![CDATA[
 function document_load()
 {
-	var editor = new TextEditor(document.getElementById("editor"));
-	editor.setTheme({ 
-		"font-family": "Menlo,Lucida Console,Courier New", 
-		"font-size": "13", 
-		"background-color": "#22252A",
-		"background-blur-color": "#000000",
-		"selection-color": "#3C424C", 
-		"selection-blur-color": "#33373F", 
-		"cursor-color": "#FFFFFF", 
-		"cursor-background-color": "#33373F",
-		"text-style": "#FFFFFF", 
-		"comment-style": "#AAAAAA italic",
-		"literal-style": "#997777",
-		"keyword-style": "#82A0C0",
-		"punctuation-style": "#888888",
-		"declaration-style": "#FFFFFF italic",
-		"error-style": "AA0000 bold" });
-	editor.setLanguage(new JavaScript());
+	var editor = new Textor.TextEditor(document.getElementById("editor"));
+	editor.language = new Textor.JavaScriptLanguage();
+	editor.theme = { 
+		"fontFamily": "Menlo,Lucida Console,Courier New", 
+		"fontSize": "13", 
+		"backgroundColor": "#22252A",
+		"backgroundBlurColor": "#000000",
+		"selectionColor": "#3C424C", 
+		"selectionBlurColor": "#33373F", 
+		"cursorColor": "#FFFFFF", 
+		"cursorBackgroundColor": "#33373F",
+		"textStyle": "#FFFFFF", 
+		"commentStyle": "#AAAAAA italic",
+		"literalStyle": "#997777",
+		"keywordStyle": "#82A0C0",
+		"punctuationStyle": "#888888",
+		"declarationStyle": "#FFFFFF italic",
+		"errorStyle": "AA0000 bold" };
 	editor.focus();
 	
 	var request = new XMLHttpRequest()
@@ -40,7 +41,7 @@ function document_load()
 	{
 		if (request.readyState === 4)
 		{
-			editor.setText(request.responseText);
+			editor.text = request.responseText;
 		}
 	}
 	request.send(null);
