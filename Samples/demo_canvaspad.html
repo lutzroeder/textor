@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <!-- saved from url=(0014)about:internet -->
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
 <head>
 <title>Textor for HTML5</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
 <script type="text/javascript" src="texteditor.js"></script>
 <script type="text/javascript" src="javascript.js"></script>
 <style type="text/css">
@@ -18,14 +18,15 @@ body          { background: #000000; margin-left: 0; margin-right: 0; margin-top
 var content = '\
 context.strokeStyle = "#fff";\n\
 \n\
-// draw matrix of rounded rectangles\n\
+// draw grid of rounded rectangles\n\
 context.lineWidth = 2;\n\
 context.fillStyle = "#fff";\n\
+\n\
 for (var i = 0; i < 4; i++)\n\
 {\n\
 	for (var j = 0; j < 4; j++)\n\
 	{\n\
-		roundedRect(135 + 60 * i, 135 + 60 * j, 50, 50, 10);\n\
+		roundedRect(85 + 60 * i, 85 + 60 * j, 50, 50, 10);\n\
 		if (i % 4 == j)\n\
 		{\n\
 			context.fill();\n\
@@ -53,27 +54,27 @@ var editor = null;
 
 function document_load()
 {
-	editor = new TextEditor(document.getElementById("editor"));
-	editor.setLanguage(new JavaScript());
-	editor.setTheme({ 
-		"font-family": "Menlo,Lucida Console,Courier New", 
-		"font-size": "13", 
-		"background-color": "#22252A",
-		"background-blur-color": "#000000",
-		"selection-color": "#3C424C", 
-		"selection-blur-color": "#33373F", 
-		"cursor-color": "#FFFFFF", 
-		"cursor-background-color": "#33373F",
-		"text-style": "#FFFFFF", 
-		"comment-style": "#AAAAAA italic",
-		"literal-style": "#997777",
-		"keyword-style": "#82A0C0",
-		"punctuation-style": "#888888",
-		"declaration-style": "#FFFFFF italic",
-		"error-style": "AA0000 bold" });
+	editor = new Textor.TextEditor(document.getElementById("editor"));
+	editor.addEventListener("textchanged", update);
+	editor.language = new Textor.JavaScriptLanguage();
+	editor.theme = { 
+		"fontFamily": "Menlo,Lucida Console,Courier New", 
+		"fontSize": "13", 
+		"backgroundColor": "#22252A",
+		"backgroundBlurColor": "#000000",
+		"selectionColor": "#3C424C", 
+		"selectionBlurColor": "#33373F", 
+		"cursorColor": "#FFFFFF", 
+		"cursorBackgroundColor": "#33373F",
+		"textStyle": "#FFFFFF", 
+		"commentStyle": "#AAAAAA italic",
+		"literalStyle": "#997777",
+		"keywordStyle": "#82A0C0",
+		"punctuationStyle": "#888888",
+		"declarationStyle": "#FFFFFF italic",
+		"errorStyle": "AA0000 bold" };
 	editor.focus();
-	editor.textChanged.add(update);
-	editor.setText(content);
+	editor.text = content;
 }
 
 var canvas = null;
@@ -91,7 +92,7 @@ function update()
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	try
 	{
-		window.eval(editor.getText());
+		window.eval(editor.text);
 	}
 	catch (exception)
 	{
@@ -111,8 +112,8 @@ function update()
 <br/>
 <br/>
 <div style="margin-left: auto; margin-right: auto; width: 1020px;">
-<canvas id="canvas" width="500" height="500"></canvas>
-<canvas id="editor" width="500" height="500" tabindex="1"></canvas>
+<canvas id="canvas" width="400" height="400"></canvas>
+<canvas id="editor" width="600" height="400" tabindex="1"></canvas>
 </div>
 </body>
 
