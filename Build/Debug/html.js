@@ -317,13 +317,3 @@ var Textor;
     Textor.HtmlLanguage = HtmlLanguage;    
 })(Textor || (Textor = {}));
 
-var Textor;
-(function (Textor) {
-    
-})(Textor || (Textor = {}));
-
-var Textor;
-(function (Textor) {
-    
-})(Textor || (Textor = {}));
-

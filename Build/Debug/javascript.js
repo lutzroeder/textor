@@ -680,13 +680,3 @@ var Textor;
     Textor.JavaScriptLanguage = JavaScriptLanguage;    
 })(Textor || (Textor = {}));
 
-var Textor;
-(function (Textor) {
-    
-})(Textor || (Textor = {}));
-
-var Textor;
-(function (Textor) {
-    
-})(Textor || (Textor = {}));
-

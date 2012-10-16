@@ -275,13 +275,3 @@ var Textor;
     Textor.CssLanguage = CssLanguage;    
 })(Textor || (Textor = {}));
 
-var Textor;
-(function (Textor) {
-    
-})(Textor || (Textor = {}));
-
-var Textor;
-(function (Textor) {
-    
-})(Textor || (Textor = {}));
-
