@@ -16,7 +16,7 @@ cp ../Samples/demo_css.html ../Build/Debug/
 cp ../Samples/demo_css.html ../Build/Release/
 
 echo Building \'Debug/texteditor.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/texteditor.js lib.d.ts libex.ts ../Source/TextEditor/*.ts
+node tsc.js -target ES5 -out ../Build/Debug/texteditor.js lib.d.ts libex.d.ts ../Source/TextEditor/*.ts
 
 if [ -f ../Build/Debug/texteditor.js ]; then
 echo Building \'Debug/javascript.js\'.
