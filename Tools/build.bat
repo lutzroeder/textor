@@ -18,7 +18,7 @@ copy ..\Samples\demo_css.html ..\Build\Release\
 echo Building 'Debug\texteditor.js'.
 set Source=
 for %%i in ("..\Source\TextEditor\*.ts") do call set Source=%%Source%% %%i
-node tsc.js -target ES5 -out ..\Build\Debug\texteditor.js lib.d.ts libex.ts %Source%
+node tsc.js -target ES5 -out ..\Build\Debug\texteditor.js lib.d.ts libex.d.ts %Source%
 
 if not exist "..\Build\Debug\texteditor.js" goto :Done
 
