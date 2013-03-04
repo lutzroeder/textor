@@ -54,48 +54,40 @@ var Textor;
                             type: this.readComment
                         });
                         return 'comment';
-                    } else {
-                        if(this._textReader.match('[CDATA[')) {
-                            this.push({
-                                type: this.readConstantData
-                            });
-                            return 'literal';
-                        } else {
-                            this.push({
-                                type: this.readDocType
-                            });
-                            return 'punctuation';
-                        }
-                    }
-                } else {
-                    if(this._textReader.match('?')) {
+                    } else if(this._textReader.match('[CDATA[')) {
                         this.push({
-                            type: this.readProcessingInstruction
+                            type: this.readConstantData
+                        });
+                        return 'literal';
+                    } else {
+                        this.push({
+                            type: this.readDocType
                         });
                         return 'punctuation';
-                    } else {
-                        if(this._textReader.match('/')) {
-                            this.push({
-                                type: this.readEndTag
-                            });
-                            return 'punctuation';
-                        } else {
-                            this.push({
-                                type: this.readStartTag,
-                                name: '',
-                                hasAttributes: false
-                            });
-                            return 'punctuation';
-                        }
                     }
-                }
-            } else {
-                if(this._textReader.match('&')) {
+                } else if(this._textReader.match('?')) {
                     this.push({
-                        type: this.readEntity
+                        type: this.readProcessingInstruction
                     });
-                    return 'literal';
+                    return 'punctuation';
+                } else if(this._textReader.match('/')) {
+                    this.push({
+                        type: this.readEndTag
+                    });
+                    return 'punctuation';
+                } else {
+                    this.push({
+                        type: this.readStartTag,
+                        name: '',
+                        hasAttributes: false
+                    });
+                    return 'punctuation';
                 }
+            } else if(this._textReader.match('&')) {
+                this.push({
+                    type: this.readEntity
+                });
+                return 'literal';
             }
             this._textReader.read();
             return 'text';
@@ -132,23 +124,19 @@ var Textor;
         HtmlLanguage.prototype.readAttribute = function () {
             if(this._textReader.skipWhitespaces()) {
                 return 'text';
-            } else {
-                if(this._textReader.match('>')) {
-                    this.pop();
-                    this.pop();
-                    this.setLanguage();
-                    return 'punctuation';
-                } else {
-                    if(this._textReader.match('=')) {
-                        this.push({
-                            type: this.readAttributeValue,
-                            value: '',
-                            quote: ''
-                        });
-                        this._token.hasValue = true;
-                        return 'punctuation';
-                    }
-                }
+            } else if(this._textReader.match('>')) {
+                this.pop();
+                this.pop();
+                this.setLanguage();
+                return 'punctuation';
+            } else if(this._textReader.match('=')) {
+                this.push({
+                    type: this.readAttributeValue,
+                    value: '',
+                    quote: ''
+                });
+                this._token.hasValue = true;
+                return 'punctuation';
             }
             var c = this._textReader.peek();
             if(c === '/') {
@@ -168,18 +156,14 @@ var Textor;
                     this._textReader.read();
                     this._token.quote = 's';
                     return 'literal';
+                } else if(c === '"') {
+                    this._textReader.read();
+                    this._token.quote = 'd';
+                    return 'literal';
+                } else if(this._textReader.skipWhitespaces()) {
+                    return 'text';
                 } else {
-                    if(c === '"') {
-                        this._textReader.read();
-                        this._token.quote = 'd';
-                        return 'literal';
-                    } else {
-                        if(this._textReader.skipWhitespaces()) {
-                            return 'text';
-                        } else {
-                            this._token.quote = '-';
-                        }
-                    }
+                    this._token.quote = '-';
                 }
             }
             var closeTag = false;
@@ -188,24 +172,18 @@ var Textor;
                 this._textReader.read();
                 this.pop();
                 style = 'literal';
-            } else {
-                if(this._token.quote === 'd' && c === '"') {
-                    this._textReader.read();
-                    this.pop();
-                    style = 'literal';
-                } else {
-                    if(this._token.quote === '-' && this._textReader.skipWhitespaces()) {
-                        this.pop();
-                        style = 'text';
-                    } else {
-                        if(this._token.quote === '-' && c === '>') {
-                            this._textReader.read();
-                            this.pop();
-                            closeTag = true;
-                            style = 'punctuation';
-                        }
-                    }
-                }
+            } else if(this._token.quote === 'd' && c === '"') {
+                this._textReader.read();
+                this.pop();
+                style = 'literal';
+            } else if(this._token.quote === '-' && this._textReader.skipWhitespaces()) {
+                this.pop();
+                style = 'text';
+            } else if(this._token.quote === '-' && c === '>') {
+                this._textReader.read();
+                this.pop();
+                closeTag = true;
+                style = 'punctuation';
             }
             if(style.length === 0) {
                 this._token.value += this._textReader.read();
@@ -266,10 +244,8 @@ var Textor;
             if(c === '<' || c === ']') {
                 if(this.testIgnoreCase('<![CDATA[')) {
                     this._token.contentData++;
-                } else {
-                    if(this.testIgnoreCase(']]>') && (this._token.contentData > 0)) {
-                        this._token.contentData--;
-                    }
+                } else if(this.testIgnoreCase(']]>') && (this._token.contentData > 0)) {
+                    this._token.contentData--;
                 }
                 if((this._token.contentData == 0) && this.testIgnoreCase(this._token.closeTag)) {
                     this.pop();
@@ -316,4 +292,3 @@ var Textor;
     })();
     Textor.HtmlLanguage = HtmlLanguage;    
 })(Textor || (Textor = {}));
-

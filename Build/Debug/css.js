@@ -52,71 +52,49 @@ var Textor;
                 }
                 this._token.keyword = false;
                 return 'punctuation';
-            } else {
-                if(this._textReader.match('}')) {
-                    if(this._tokenStack.length > 1) {
-                        this.pop();
-                        return 'punctuation';
-                    }
-                    this._state = null;
-                    return 'error';
-                } else {
-                    if(this._textReader.match('[')) {
-                        this._token.selector++;
-                        this._token.literal = false;
-                        return 'punctuation';
-                    } else {
-                        if(this._textReader.match('(')) {
-                            this._token.bracket++;
-                            return 'punctuation';
-                        } else {
-                            if(this._textReader.match(']')) {
-                                this._token.literal = false;
-                                if(this._token.selector > 0) {
-                                    this._token.selector--;
-                                    return 'punctuation';
-                                }
-                                return 'error';
-                            } else {
-                                if(this._textReader.match(')')) {
-                                    if(this._token.bracket > 0) {
-                                        this._token.bracket--;
-                                        return 'punctuation';
-                                    }
-                                    return 'error';
-                                } else {
-                                    if(this._textReader.match('=')) {
-                                        this._token.literal = true;
-                                        return 'punctuation';
-                                    } else {
-                                        if(this._textReader.match(';')) {
-                                            this._token.keyword = false;
-                                            return 'punctuation';
-                                        } else {
-                                            if(this._textReader.match(':') || this._textReader.match('#') || this._textReader.match('.') || this._textReader.match(',') || this._textReader.match('+') || this._textReader.match('*') || this._textReader.match('|') || this._textReader.match('>')) {
-                                                return 'punctuation';
-                                            } else {
-                                                if(this.matchComment()) {
-                                                    return 'comment';
-                                                } else {
-                                                    if(this._textReader.match('@')) {
-                                                        this._token.keyword = true;
-                                                        this.readWord();
-                                                        return 'keyword';
-                                                    } else {
-                                                        if(this.matchString()) {
-                                                            return 'literal';
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+            } else if(this._textReader.match('}')) {
+                if(this._tokenStack.length > 1) {
+                    this.pop();
+                    return 'punctuation';
                 }
+                this._state = null;
+                return 'error';
+            } else if(this._textReader.match('[')) {
+                this._token.selector++;
+                this._token.literal = false;
+                return 'punctuation';
+            } else if(this._textReader.match('(')) {
+                this._token.bracket++;
+                return 'punctuation';
+            } else if(this._textReader.match(']')) {
+                this._token.literal = false;
+                if(this._token.selector > 0) {
+                    this._token.selector--;
+                    return 'punctuation';
+                }
+                return 'error';
+            } else if(this._textReader.match(')')) {
+                if(this._token.bracket > 0) {
+                    this._token.bracket--;
+                    return 'punctuation';
+                }
+                return 'error';
+            } else if(this._textReader.match('=')) {
+                this._token.literal = true;
+                return 'punctuation';
+            } else if(this._textReader.match(';')) {
+                this._token.keyword = false;
+                return 'punctuation';
+            } else if(this._textReader.match(':') || this._textReader.match('#') || this._textReader.match('.') || this._textReader.match(',') || this._textReader.match('+') || this._textReader.match('*') || this._textReader.match('|') || this._textReader.match('>')) {
+                return 'punctuation';
+            } else if(this.matchComment()) {
+                return 'comment';
+            } else if(this._textReader.match('@')) {
+                this._token.keyword = true;
+                this.readWord();
+                return 'keyword';
+            } else if(this.matchString()) {
+                return 'literal';
             }
             var text = this.readWord();
             if(text.length > 0) {
@@ -134,26 +112,18 @@ var Textor;
         CssLanguage.prototype.readBlock = function () {
             if(this._textReader.skipWhitespaces() || this._textReader.skipLineTerminators()) {
                 return 'text';
-            } else {
-                if(this._textReader.match('}')) {
-                    this.pop();
-                    return 'punctuation';
-                } else {
-                    if(this.matchComment()) {
-                        return 'comment';
-                    } else {
-                        if(this._textReader.match(';')) {
-                            return 'punctuation';
-                        } else {
-                            if(this._textReader.match(':')) {
-                                this.push({
-                                    type: this.readExpression
-                                });
-                                return 'punctuation';
-                            }
-                        }
-                    }
-                }
+            } else if(this._textReader.match('}')) {
+                this.pop();
+                return 'punctuation';
+            } else if(this.matchComment()) {
+                return 'comment';
+            } else if(this._textReader.match(';')) {
+                return 'punctuation';
+            } else if(this._textReader.match(':')) {
+                this.push({
+                    type: this.readExpression
+                });
+                return 'punctuation';
             }
             var text = this.readWord();
             if(text.length > 0) {
@@ -173,32 +143,20 @@ var Textor;
                     type: this.readExpression
                 });
                 return 'punctuation';
-            } else {
-                if(this._textReader.match('}')) {
-                    this.pop();
-                    this.pop();
-                    return 'punctuation';
-                } else {
-                    if(this._textReader.match('(') || this._textReader.match(')')) {
-                        return 'punctuation';
-                    } else {
-                        if(this.matchComment()) {
-                            return 'comment';
-                        } else {
-                            if(this.matchString()) {
-                                return 'literal';
-                            } else {
-                                if(this._textReader.skipWhitespaces()) {
-                                    return 'text';
-                                } else {
-                                    if(this._textReader.match('url')) {
-                                        return 'text';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            } else if(this._textReader.match('}')) {
+                this.pop();
+                this.pop();
+                return 'punctuation';
+            } else if(this._textReader.match('(') || this._textReader.match(')')) {
+                return 'punctuation';
+            } else if(this.matchComment()) {
+                return 'comment';
+            } else if(this.matchString()) {
+                return 'literal';
+            } else if(this._textReader.skipWhitespaces()) {
+                return 'text';
+            } else if(this._textReader.match('url')) {
+                return 'text';
             }
             this._textReader.read();
             return 'literal';
@@ -225,13 +183,11 @@ var Textor;
                     type: this.readComment
                 });
                 return true;
-            } else {
-                if(this._textReader.match('<!')) {
-                    this.push({
-                        type: this.readXmlComment
-                    });
-                    return true;
-                }
+            } else if(this._textReader.match('<!')) {
+                this.push({
+                    type: this.readXmlComment
+                });
+                return true;
             }
             return false;
         };
@@ -274,4 +230,3 @@ var Textor;
     })();
     Textor.CssLanguage = CssLanguage;    
 })(Textor || (Textor = {}));
-

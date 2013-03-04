@@ -57,7 +57,6 @@ var Textor;
     })();
     Textor.ContainerUndoUnit = ContainerUndoUnit;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var LanguageService = (function () {
@@ -189,30 +188,28 @@ var Textor;
                     }
                     this._syntaxTable[newPosition.line] = this._syntaxTable[newPosition.line].concat(syntax);
                 }
-            } else {
-                if(oldPosition.compareTo(newPosition) > 0) {
-                    var index = 0;
-                    if(oldPosition.line >= this._syntaxTable.length) {
-                        oldPosition.line = this._syntaxTable.length - 1;
-                        index = this._syntaxTable[oldPosition.line].length - 1;
-                    } else {
-                        while((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
-                            index++;
-                        }
+            } else if(oldPosition.compareTo(newPosition) > 0) {
+                var index = 0;
+                if(oldPosition.line >= this._syntaxTable.length) {
+                    oldPosition.line = this._syntaxTable.length - 1;
+                    index = this._syntaxTable[oldPosition.line].length - 1;
+                } else {
+                    while((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
+                        index++;
                     }
-                    if(this._syntaxTable[oldPosition.line]) {
-                        var syntax = this._syntaxTable[oldPosition.line].splice(index, this._syntaxTable[oldPosition.line].length - index);
-                        for(var i = 0; i < syntax.length; i++) {
-                            syntax[i].start -= oldPosition.column - newPosition.column;
-                        }
-                        index = 0;
-                        while((this._syntaxTable[newPosition.line]) && (index < this._syntaxTable[newPosition.line].length) && (newPosition.column > this._syntaxTable[newPosition.line][index].start)) {
-                            index++;
-                        }
-                        this._syntaxTable.splice(newPosition.line + 1, oldPosition.line - newPosition.line);
-                        this._syntaxTable[newPosition.line].splice(index, this._syntaxTable[newPosition.line].length - index);
-                        this._syntaxTable[newPosition.line] = this._syntaxTable[newPosition.line].concat(syntax);
+                }
+                if(this._syntaxTable[oldPosition.line]) {
+                    var syntax = this._syntaxTable[oldPosition.line].splice(index, this._syntaxTable[oldPosition.line].length - index);
+                    for(var i = 0; i < syntax.length; i++) {
+                        syntax[i].start -= oldPosition.column - newPosition.column;
                     }
+                    index = 0;
+                    while((this._syntaxTable[newPosition.line]) && (index < this._syntaxTable[newPosition.line].length) && (newPosition.column > this._syntaxTable[newPosition.line][index].start)) {
+                        index++;
+                    }
+                    this._syntaxTable.splice(newPosition.line + 1, oldPosition.line - newPosition.line);
+                    this._syntaxTable[newPosition.line].splice(index, this._syntaxTable[newPosition.line].length - index);
+                    this._syntaxTable[newPosition.line] = this._syntaxTable[newPosition.line].concat(syntax);
                 }
             }
         };
@@ -259,22 +256,20 @@ var Textor;
                 if(state !== null) {
                     current.state = state;
                 }
-            } else {
-                if(this._index < this._syntaxTable[this._line].length) {
-                    var current = this._syntaxTable[this._line][this._index];
-                    if(column >= current.start) {
-                        current.start = column;
-                        current.style = style;
-                        current.state = state;
-                        this._index++;
-                    } else {
-                        this._syntaxTable[this._line].splice(this._index, 0, new Textor.LanguageStyle(style, state, column));
-                        this._index++;
-                    }
+            } else if(this._index < this._syntaxTable[this._line].length) {
+                var current = this._syntaxTable[this._line][this._index];
+                if(column >= current.start) {
+                    current.start = column;
+                    current.style = style;
+                    current.state = state;
+                    this._index++;
                 } else {
-                    this._syntaxTable[this._line].push(new Textor.LanguageStyle(style, state, column));
+                    this._syntaxTable[this._line].splice(this._index, 0, new Textor.LanguageStyle(style, state, column));
                     this._index++;
                 }
+            } else {
+                this._syntaxTable[this._line].push(new Textor.LanguageStyle(style, state, column));
+                this._index++;
             }
             while(this._line < nextLine) {
                 this._syntaxTable[this._line].splice(this._index, this._syntaxTable[this._line].length - this._index);
@@ -301,7 +296,6 @@ var Textor;
     })();
     Textor.LanguageService = LanguageService;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var LanguageStyle = (function () {
@@ -314,7 +308,6 @@ var Textor;
     })();
     Textor.LanguageStyle = LanguageStyle;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var Point = (function () {
@@ -329,7 +322,6 @@ var Textor;
     })();
     Textor.Point = Point;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var Rectangle = (function () {
@@ -353,7 +345,6 @@ var Textor;
     })();
     Textor.Rectangle = Rectangle;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var SelectionChangeEvent = (function () {
@@ -365,7 +356,6 @@ var Textor;
     })();
     Textor.SelectionChangeEvent = SelectionChangeEvent;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var SelectionUndoUnit = (function () {
@@ -409,7 +399,6 @@ var Textor;
     })();
     Textor.SelectionUndoUnit = SelectionUndoUnit;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var Size = (function () {
@@ -421,7 +410,6 @@ var Textor;
     })();
     Textor.Size = Size;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextBuffer = (function () {
@@ -434,30 +422,22 @@ var Textor;
         }
         TextBuffer.prototype.addEventListener = function (type, callback) {
             switch(type) {
-                case "textchanging": {
+                case "textchanging":
                     this._textChangingHandlers.push(callback);
                     break;
-
-                }
-                case "textchanged": {
+                case "textchanged":
                     this._textChangedHandlers.push(callback);
                     break;
-
-                }
             }
         };
         TextBuffer.prototype.removeEventListener = function (type, callback) {
             switch(type) {
-                case "textchanging": {
+                case "textchanging":
                     this._textChangingHandlers.remove(callback);
                     break;
-
-                }
-                case "textchanged": {
+                case "textchanged":
                     this._textChangedHandlers.remove(callback);
                     break;
-
-                }
             }
         };
         TextBuffer.prototype.setText = function (textRange, text) {
@@ -507,7 +487,6 @@ var Textor;
     })();
     Textor.TextBuffer = TextBuffer;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextChangeEvent = (function () {
@@ -520,7 +499,6 @@ var Textor;
     })();
     Textor.TextChangeEvent = TextChangeEvent;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextController = (function () {
@@ -676,12 +654,10 @@ var Textor;
                         this._textEditor.paste(text);
                     }
                 }.bind(this), 1);
-            } else {
-                if(this._isWebKit) {
-                    var text = e.clipboardData.getData("text/plain");
-                    this._textEditor.paste(text);
-                    this.stopEvent(e);
-                }
+            } else if(this._isWebKit) {
+                var text = e.clipboardData.getData("text/plain");
+                this._textEditor.paste(text);
+                this.stopEvent(e);
             }
         };
         TextController.prototype.textArea_beforeCut = function (e) {
@@ -721,16 +697,12 @@ var Textor;
                 }
                 this._mouseCapture = true;
                 this.startScrollTimer();
-            } else {
-                if(clicks === 2) {
-                    this._textEditor.selectWord(position.line, position.column);
-                    this._mouseCapture = true;
-                    this.startScrollTimer();
-                } else {
-                    if(clicks === 3) {
-                        this._textEditor.selectRange(position.line, 0, position.line + 1, 0);
-                    }
-                }
+            } else if(clicks === 2) {
+                this._textEditor.selectWord(position.line, position.column);
+                this._mouseCapture = true;
+                this.startScrollTimer();
+            } else if(clicks === 3) {
+                this._textEditor.selectRange(position.line, 0, position.line + 1, 0);
             }
             this.updateMouseCursor();
         };
@@ -752,10 +724,8 @@ var Textor;
             }
             if(e.wheelDelta) {
                 delta = e.wheelDelta / 120;
-            } else {
-                if(e.detail) {
-                    delta = -e.detail / 3;
-                }
+            } else if(e.detail) {
+                delta = -e.detail / 3;
             }
             if(delta !== 0) {
                 this._textEditor.scroll(Math.floor(-delta), 0);
@@ -954,22 +924,16 @@ var Textor;
                     if(keyCode === 65) {
                         ctrlKey = false;
                         keyCode = 36;
-                    } else {
-                        if(keyCode === 69) {
-                            ctrlKey = false;
-                            keyCode = 35;
-                        }
+                    } else if(keyCode === 69) {
+                        ctrlKey = false;
+                        keyCode = 35;
                     }
-                } else {
-                    if(metaKey && keyCode === 37) {
-                        metaKey = false;
-                        keyCode = 36;
-                    } else {
-                        if(metaKey && keyCode === 39) {
-                            metaKey = false;
-                            keyCode = 35;
-                        }
-                    }
+                } else if(metaKey && keyCode === 37) {
+                    metaKey = false;
+                    keyCode = 36;
+                } else if(metaKey && keyCode === 39) {
+                    metaKey = false;
+                    keyCode = 35;
                 }
             }
             return this._textEditor.processKey(keyCode, shiftKey, ctrlKey, altKey, metaKey);
@@ -978,7 +942,6 @@ var Textor;
     })();
     Textor.TextController = TextController;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextEditor = (function () {
@@ -1049,40 +1012,28 @@ var Textor;
         };
         TextEditor.prototype.addEventListener = function (type, callback) {
             switch(type) {
-                case "textchanging": {
+                case "textchanging":
                     this._textChangingHandlers.push(callback);
                     break;
-
-                }
-                case "textchanged": {
+                case "textchanged":
                     this._textChangedHandlers.push(callback);
                     break;
-
-                }
-                case "selectionchanged": {
+                case "selectionchanged":
                     this._selectionChangedHandlers.push(callback);
                     break;
-
-                }
             }
         };
         TextEditor.prototype.removeEventListener = function (type, callback) {
             switch(type) {
-                case "textchanging": {
+                case "textchanging":
                     this._textChangingHandlers.remove(callback);
                     break;
-
-                }
-                case "textchanged": {
+                case "textchanged":
                     this._textChangedHandlers.remove(callback);
                     break;
-
-                }
-                case "selectionchanged": {
+                case "selectionchanged":
                     this._selectionChangedHandlers.remove(callback);
                     break;
-
-                }
             }
         };
         Object.defineProperty(TextEditor.prototype, "theme", {
@@ -1278,40 +1229,30 @@ var Textor;
                 if(keyCode === 65) {
                     this.selectAll();
                     return true;
-                } else {
-                    if(keyCode === 88) {
-                        if(window.clipboardData && window.clipboardData.setData) {
-                            this.cut();
+                } else if(keyCode === 88) {
+                    if(window.clipboardData && window.clipboardData.setData) {
+                        this.cut();
+                        return true;
+                    }
+                } else if(keyCode === 67) {
+                    if(window.clipboardData && window.clipboardData.setData) {
+                        this.copy();
+                        return true;
+                    }
+                } else if(keyCode === 86) {
+                    if(window.clipboardData && window.clipboardData.getData) {
+                        var text = window.clipboardData.getData("Text");
+                        if(text) {
+                            this.paste(text);
                             return true;
                         }
-                    } else {
-                        if(keyCode === 67) {
-                            if(window.clipboardData && window.clipboardData.setData) {
-                                this.copy();
-                                return true;
-                            }
-                        } else {
-                            if(keyCode === 86) {
-                                if(window.clipboardData && window.clipboardData.getData) {
-                                    var text = window.clipboardData.getData("Text");
-                                    if(text) {
-                                        this.paste(text);
-                                        return true;
-                                    }
-                                }
-                            } else {
-                                if((keyCode === 90) && (!shiftKey)) {
-                                    this.undo();
-                                    return true;
-                                } else {
-                                    if(((keyCode === 90) && (shiftKey)) || (keyCode === 89)) {
-                                        this.redo();
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
                     }
+                } else if((keyCode === 90) && (!shiftKey)) {
+                    this.undo();
+                    return true;
+                } else if(((keyCode === 90) && (shiftKey)) || (keyCode === 89)) {
+                    this.redo();
+                    return true;
                 }
             }
             if(!metaKey && !altKey) {
@@ -1319,101 +1260,75 @@ var Textor;
                     this._textModel.moveCursor("column", !ctrlKey ? "1" : "word", "previous", shiftKey);
                     this.updateScrollPosition();
                     return true;
-                } else {
-                    if(keyCode === 39) {
-                        this._textModel.moveCursor("column", !ctrlKey ? "1" : "word", "next", shiftKey);
+                } else if(keyCode === 39) {
+                    this._textModel.moveCursor("column", !ctrlKey ? "1" : "word", "next", shiftKey);
+                    this.updateScrollPosition();
+                    return true;
+                } else if(keyCode === 38) {
+                    if(!ctrlKey) {
+                        this._textModel.moveCursor("line", "1", "previous", shiftKey);
+                        this.updateScrollPosition();
+                    } else {
+                        this.scroll(-1, 0);
+                    }
+                    return true;
+                } else if(keyCode === 40) {
+                    if(!ctrlKey) {
+                        this._textModel.moveCursor("line", "1", "next", shiftKey);
+                        this.updateScrollPosition();
+                    } else {
+                        this.scroll(+1, 0);
+                    }
+                    return true;
+                } else if(!ctrlKey) {
+                    if(keyCode === 8) {
+                        this._textModel.deleteSelection("previous");
                         this.updateScrollPosition();
                         return true;
-                    } else {
-                        if(keyCode === 38) {
-                            if(!ctrlKey) {
-                                this._textModel.moveCursor("line", "1", "previous", shiftKey);
-                                this.updateScrollPosition();
-                            } else {
-                                this.scroll(-1, 0);
-                            }
-                            return true;
+                    } else if(keyCode === 9) {
+                        this.insertText("\t");
+                        this.updateScrollPosition();
+                        return true;
+                    } else if(keyCode === 13) {
+                        this.insertText("\n" + this._textModel.getIndent());
+                        this.updateScrollPosition();
+                        return true;
+                    } else if(keyCode === 45) {
+                        this._textModel.insertText(" ");
+                        this.updateScrollPosition();
+                        return true;
+                    } else if(keyCode === 46) {
+                        this._textModel.deleteSelection("next");
+                        this.updateScrollPosition();
+                        return true;
+                    } else if(keyCode === 32) {
+                        this.insertText(" ");
+                        this.updateScrollPosition();
+                        return true;
+                    } else if(keyCode === 33) {
+                        if(shiftKey) {
+                            this._textModel.moveCursor("line", this.size.line.toString(), "previous", shiftKey);
+                            this.updateScrollPosition();
                         } else {
-                            if(keyCode === 40) {
-                                if(!ctrlKey) {
-                                    this._textModel.moveCursor("line", "1", "next", shiftKey);
-                                    this.updateScrollPosition();
-                                } else {
-                                    this.scroll(1, 0);
-                                }
-                                return true;
-                            } else {
-                                if(!ctrlKey) {
-                                    if(keyCode === 8) {
-                                        this._textModel.deleteSelection("previous");
-                                        this.updateScrollPosition();
-                                        return true;
-                                    } else {
-                                        if(keyCode === 9) {
-                                            this.insertText("\t");
-                                            this.updateScrollPosition();
-                                            return true;
-                                        } else {
-                                            if(keyCode === 13) {
-                                                this.insertText("\n" + this._textModel.getIndent());
-                                                this.updateScrollPosition();
-                                                return true;
-                                            } else {
-                                                if(keyCode === 45) {
-                                                    this._textModel.insertText(" ");
-                                                    this.updateScrollPosition();
-                                                    return true;
-                                                } else {
-                                                    if(keyCode === 46) {
-                                                        this._textModel.deleteSelection("next");
-                                                        this.updateScrollPosition();
-                                                        return true;
-                                                    } else {
-                                                        if(keyCode === 32) {
-                                                            this.insertText(" ");
-                                                            this.updateScrollPosition();
-                                                            return true;
-                                                        } else {
-                                                            if(keyCode === 33) {
-                                                                if(shiftKey) {
-                                                                    this._textModel.moveCursor("line", this.size.line.toString(), "previous", shiftKey);
-                                                                    this.updateScrollPosition();
-                                                                } else {
-                                                                    this.scroll(-this.size.line, 0);
-                                                                }
-                                                                return true;
-                                                            } else {
-                                                                if(keyCode === 34) {
-                                                                    if(shiftKey) {
-                                                                        this._textModel.moveCursor("line", this.size.line.toString(), "next", shiftKey);
-                                                                        this.updateScrollPosition();
-                                                                    } else {
-                                                                        this.scroll(+this.size.line, 0);
-                                                                    }
-                                                                    return true;
-                                                                } else {
-                                                                    if(keyCode === 35) {
-                                                                        this._textModel.moveCursor("column", "boundary", "next", shiftKey);
-                                                                        this.updateScrollPosition();
-                                                                        return true;
-                                                                    } else {
-                                                                        if(keyCode === 36) {
-                                                                            this._textModel.moveCursor("column", "boundary", "previous", shiftKey);
-                                                                            this.updateScrollPosition();
-                                                                            return true;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            this.scroll(-this.size.line, 0);
                         }
+                        return true;
+                    } else if(keyCode === 34) {
+                        if(shiftKey) {
+                            this._textModel.moveCursor("line", this.size.line.toString(), "next", shiftKey);
+                            this.updateScrollPosition();
+                        } else {
+                            this.scroll(+this.size.line, 0);
+                        }
+                        return true;
+                    } else if(keyCode === 35) {
+                        this._textModel.moveCursor("column", "boundary", "next", shiftKey);
+                        this.updateScrollPosition();
+                        return true;
+                    } else if(keyCode === 36) {
+                        this._textModel.moveCursor("column", "boundary", "previous", shiftKey);
+                        this.updateScrollPosition();
+                        return true;
                     }
                 }
             }
@@ -1437,23 +1352,19 @@ var Textor;
             var horizontal = 0;
             if(selection.line < 0) {
                 vertical = selection.line;
-            } else {
-                if(selection.line > size.line) {
-                    vertical = selection.line - size.line;
-                }
+            } else if(selection.line > size.line) {
+                vertical = selection.line - size.line;
             }
             if(selection.column < 5) {
                 horizontal = selection.column - 5;
                 if(this._scrollPosition.column + horizontal < 0) {
                     horizontal = -this._scrollPosition.column;
                 }
-            } else {
-                if(selection.column > (size.column - 5)) {
-                    horizontal = selection.column - size.column + 5;
-                    var maxColumns = this.getMaxColumns();
-                    if(this._scrollPosition.column + horizontal + size.column > maxColumns + 1) {
-                        horizontal = maxColumns - size.column - this._scrollPosition.column + 1;
-                    }
+            } else if(selection.column > (size.column - 5)) {
+                horizontal = selection.column - size.column + 5;
+                var maxColumns = this.getMaxColumns();
+                if(this._scrollPosition.column + horizontal + size.column > maxColumns + 1) {
+                    horizontal = maxColumns - size.column - this._scrollPosition.column + 1;
                 }
             }
             if((horizontal !== 0) || (vertical !== 0)) {
@@ -1712,7 +1623,6 @@ var Textor;
     })();
     Textor.TextEditor = TextEditor;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextModel = (function () {
@@ -1724,20 +1634,16 @@ var Textor;
         }
         TextModel.prototype.addEventListener = function (type, callback) {
             switch(type) {
-                case "selectionchanged": {
+                case "selectionchanged":
                     this._selectionChangedHandlers.push(callback);
                     break;
-
-                }
             }
         };
         TextModel.prototype.removeEventListener = function (type, callback) {
             switch(type) {
-                case "selectionchanged": {
+                case "selectionchanged":
                     this._selectionChangedHandlers.remove(callback);
                     break;
-
-                }
             }
         };
         Object.defineProperty(TextModel.prototype, "textRange", {
@@ -1791,21 +1697,17 @@ var Textor;
                                 }
                             }
                         }
-                    } else {
-                        if(distance === "word") {
-                            var text = this._textBuffer.getLine(position.line);
-                            if((direction !== "previous") && (position.column >= text.length)) {
-                                position.column++;
-                            } else {
-                                if((direction === "previous") && (position.column === 0)) {
-                                    position.column--;
-                                } else {
-                                    position.column = this.findWordBreak(text, position.column, (direction == "previous") ? -1 : 1);
-                                }
-                            }
+                    } else if(distance === "word") {
+                        var text = this._textBuffer.getLine(position.line);
+                        if((direction !== "previous") && (position.column >= text.length)) {
+                            position.column++;
+                        } else if((direction === "previous") && (position.column === 0)) {
+                            position.column--;
                         } else {
-                            position.column += (direction === "previous") ? -Number(distance) : +Number(distance);
+                            position.column = this.findWordBreak(text, position.column, (direction == "previous") ? -1 : +1);
                         }
+                    } else {
+                        position.column += (direction === "previous") ? -Number(distance) : +Number(distance);
                     }
                     if(position.column < 0) {
                         position.line--;
@@ -1833,11 +1735,9 @@ var Textor;
                 if(position.line < 0) {
                     position.line = 0;
                     position.column = 0;
-                } else {
-                    if(position.line > this._textBuffer.getLines() - 1) {
-                        position.line = this._textBuffer.getLines() - 1;
-                        position.column = this._textBuffer.getColumns(position.line);
-                    }
+                } else if(position.line > this._textBuffer.getLines() - 1) {
+                    position.line = this._textBuffer.getLines() - 1;
+                    position.column = this._textBuffer.getColumns(position.line);
                 }
             }
             position = this.toScreenPosition(position);
@@ -1867,17 +1767,15 @@ var Textor;
                             textRange.start.column = this._textBuffer.getColumns(textRange.start.line);
                         }
                     }
-                } else {
-                    if(position === "next") {
-                        textRange.end.column++;
-                        if(textRange.end.column > this._textBuffer.getColumns(textRange.end.line)) {
-                            textRange.end.line++;
-                            if(textRange.end.line > this._textBuffer.getLines() - 1) {
-                                textRange.end.line = this._textBuffer.getLines() - 1;
-                                textRange.end.column = this._textBuffer.getColumns(textRange.end.line);
-                            } else {
-                                textRange.end.column = 0;
-                            }
+                } else if(position === "next") {
+                    textRange.end.column++;
+                    if(textRange.end.column > this._textBuffer.getColumns(textRange.end.line)) {
+                        textRange.end.line++;
+                        if(textRange.end.line > this._textBuffer.getLines() - 1) {
+                            textRange.end.line = this._textBuffer.getLines() - 1;
+                            textRange.end.column = this._textBuffer.getColumns(textRange.end.line);
+                        } else {
+                            textRange.end.column = 0;
                         }
                     }
                 }
@@ -1893,10 +1791,8 @@ var Textor;
                 if(line >= this._textBuffer.getLines()) {
                     line = this._textBuffer.getLines() - 1;
                     column = this.getColumns(line);
-                } else {
-                    if(column > this.getColumns(line)) {
-                        column = this.getColumns(line);
-                    }
+                } else if(column > this.getColumns(line)) {
+                    column = this.getColumns(line);
                 }
                 return new Textor.TextRange(new Textor.TextPosition(line, column), new Textor.TextPosition(line, column));
             }
@@ -2006,7 +1902,6 @@ var Textor;
     })();
     Textor.TextModel = TextModel;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextPosition = (function () {
@@ -2031,7 +1926,6 @@ var Textor;
     })();
     Textor.TextPosition = TextPosition;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextRange = (function () {
@@ -2059,7 +1953,6 @@ var Textor;
     })();
     Textor.TextRange = TextRange;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextReader = (function () {
@@ -2130,12 +2023,10 @@ var Textor;
                     }
                     skipped = true;
                     continue;
-                } else {
-                    if(character === '\r' || character === '\u2028' || character === '\u2029') {
-                        this.read();
-                        skipped = true;
-                        continue;
-                    }
+                } else if(character === '\r' || character === '\u2028' || character === '\u2029') {
+                    this.read();
+                    skipped = true;
+                    continue;
                 }
                 break;
             }
@@ -2156,7 +2047,6 @@ var Textor;
     })();
     Textor.TextReader = TextReader;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var TextUndoUnit = (function () {
@@ -2204,7 +2094,6 @@ var Textor;
     })();
     Textor.TextUndoUnit = TextUndoUnit;    
 })(Textor || (Textor = {}));
-
 var Textor;
 (function (Textor) {
     var UndoService = (function () {
@@ -2271,4 +2160,3 @@ var Textor;
     })();
     Textor.UndoService = UndoService;    
 })(Textor || (Textor = {}));
-
