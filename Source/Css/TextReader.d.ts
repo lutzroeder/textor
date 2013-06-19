@@ -1,6 +1,6 @@
-module Textor
+declare module Textor
 {
-	export declare class TextReader
+	class TextReader
 	{
 		peek(): string;
 		read(): string;

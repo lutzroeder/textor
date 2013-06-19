@@ -1,6 +1,6 @@
-module Textor
+declare module Textor
 {
-	export interface ILanguage
+	interface ILanguage
 	{
 		begin(textReader: TextReader, state: string);
 		read(): ILanguageStyle;

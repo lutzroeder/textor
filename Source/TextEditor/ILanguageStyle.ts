@@ -1,6 +1,6 @@
-module Textor
+declare module Textor
 {
-	export interface ILanguageStyle
+	interface ILanguageStyle
 	{
 		style: string;
 		state: string;
