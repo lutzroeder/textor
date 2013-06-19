@@ -1,6 +1,6 @@
-module Textor
+declare module Textor
 {
-	export declare class TextPosition
+	class TextPosition
 	{
 		line: number;
 	 	column: number;

@@ -1,7 +1,7 @@
 Array.prototype.remove = function (obj) {
     var i = this.length;
-    while(i--) {
-        if(this[i] == obj) {
+    while (i--) {
+        if (this[i] == obj) {
             this.splice(i, 1);
         }
     }
@@ -15,21 +15,24 @@ var Textor;
         ContainerUndoUnit.prototype.add = function (undoUnit) {
             this._undoUnits.push(undoUnit);
         };
+
         ContainerUndoUnit.prototype.undo = function () {
-            for(var i = 0; i < this._undoUnits.length; i++) {
+            for (var i = 0; i < this._undoUnits.length; i++) {
                 this._undoUnits[i].undo();
             }
         };
+
         ContainerUndoUnit.prototype.redo = function () {
-            for(var i = 0; i < this._undoUnits.length; i++) {
+            for (var i = 0; i < this._undoUnits.length; i++) {
                 this._undoUnits[i].redo();
             }
         };
+
         Object.defineProperty(ContainerUndoUnit.prototype, "isEmpty", {
             get: function () {
-                if(this._undoUnits.length > 0) {
-                    for(var i = 0; i < this._undoUnits.length; i++) {
-                        if(!this._undoUnits[i].isEmpty) {
+                if (this._undoUnits.length > 0) {
+                    for (var i = 0; i < this._undoUnits.length; i++) {
+                        if (!this._undoUnits[i].isEmpty) {
                             return false;
                         }
                     }
@@ -39,6 +42,7 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         Object.defineProperty(ContainerUndoUnit.prototype, "undoUnits", {
             get: function () {
                 return this._undoUnits;
@@ -46,16 +50,17 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         ContainerUndoUnit.prototype.toString = function () {
             var text = "Container:\n";
-            for(var i = 0; i < this._undoUnits.length; i++) {
+            for (var i = 0; i < this._undoUnits.length; i++) {
                 text += "\t" + this._undoUnits[i].toString() + "\n";
             }
             return text;
         };
         return ContainerUndoUnit;
     })();
-    Textor.ContainerUndoUnit = ContainerUndoUnit;    
+    Textor.ContainerUndoUnit = ContainerUndoUnit;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -66,6 +71,7 @@ var Textor;
             this._syntaxTable = [];
             this._textEditor = textEditor;
         }
+
         Object.defineProperty(LanguageService.prototype, "language", {
             get: function () {
                 return this._language;
@@ -76,34 +82,37 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         LanguageService.prototype.getStyles = function (line) {
-            if(this._syntaxTable[line]) {
+            if (this._syntaxTable[line]) {
                 return this._syntaxTable[line];
             }
             return [];
         };
+
         LanguageService.prototype.invalidate = function (oldRange, newRange, text) {
-            if(this._language !== null) {
-                if(this._timeoutEnabled) {
+            if (this._language !== null) {
+                if (this._timeoutEnabled) {
                     window.clearTimeout(this._timeout);
                     this._timeoutEnabled = false;
                 }
+
                 var state = null;
                 this._line = 0;
                 this._column = 0;
-                if(this._syntaxTable.length > 0) {
+                if (this._syntaxTable.length > 0) {
                     var line = oldRange.start.line;
                     var index = 0;
-                    while((this._syntaxTable[line]) && (index < this._syntaxTable[line].length) && (oldRange.start.column > this._syntaxTable[line][index].start)) {
+                    while ((this._syntaxTable[line]) && (index < this._syntaxTable[line].length) && (oldRange.start.column > this._syntaxTable[line][index].start)) {
                         index++;
                     }
-                    while((line >= 0) && (index >= 0)) {
+                    while ((line >= 0) && (index >= 0)) {
                         index--;
-                        if(index < 0) {
+                        if (index < 0) {
                             line--;
                             index = this._syntaxTable[line] ? this._syntaxTable[line].length - 1 : 0;
                         }
-                        if(this._syntaxTable[line] && this._syntaxTable[line][index] && this._syntaxTable[line][index].state !== null) {
+                        if (this._syntaxTable[line] && this._syntaxTable[line][index] && this._syntaxTable[line][index].state !== null) {
                             state = this._syntaxTable[line][index].state;
                             this._line = line;
                             this._column = this._syntaxTable[line][index].start;
@@ -111,14 +120,17 @@ var Textor;
                         }
                     }
                 }
+
                 this.moveRange(oldRange.end.clone(), newRange.end.clone());
-                if(text.length > 0) {
+                if (text.length > 0) {
                     this.clearRange(newRange.start, newRange.end);
                 }
+
                 this._index = 0;
-                while((this._syntaxTable[this._line]) && (this._index < this._syntaxTable[this._line].length) && (this._column > this._syntaxTable[this._line][this._index].start)) {
+                while ((this._syntaxTable[this._line]) && (this._index < this._syntaxTable[this._line].length) && (this._column > this._syntaxTable[this._line][this._index].start)) {
                     this._index++;
                 }
+
                 this._textReader = this._textEditor.createTextReader();
                 this._textReader.textPosition.line = this._line;
                 this._textReader.textPosition.column = this._column;
@@ -127,17 +139,20 @@ var Textor;
                 this.window_setTimeout();
             }
         };
+
         LanguageService.prototype.window_setTimeout = function () {
             var timeout = new Date().getTime() + 20;
+
             var startPosition = new Textor.TextPosition(this._line, this._column);
             var line = this._textReader.textPosition.line;
             var column = this._textReader.textPosition.column;
-            while(this._textReader.peek().length > 0) {
+
+            while (this._textReader.peek().length > 0) {
                 var data = this._language.read();
                 var c = this._textReader.peek();
-                if((c.length === 0) || (data.style !== null) || (data.state !== null)) {
-                    if((c.length === 0) || (data.style !== this._style) || (data.state !== this._state) || (data.state !== null)) {
-                        if((c.length === 0) || (line !== this._line) || (column !== this._column) || (data.state !== null)) {
+                if ((c.length === 0) || (data.style !== null) || (data.state !== null)) {
+                    if ((c.length === 0) || (data.style !== this._style) || (data.state !== this._state) || (data.state !== null)) {
+                        if ((c.length === 0) || (line !== this._line) || (column !== this._column) || (data.state !== null)) {
                             this.addRecord(this._column, line, this._style, this._state);
                             this._column = column;
                         }
@@ -147,64 +162,62 @@ var Textor;
                     line = this._textReader.textPosition.line;
                     column = this._textReader.textPosition.column;
                 }
-                if(new Date().getTime() > timeout) {
+
+                if (new Date().getTime() > timeout) {
                     break;
                 }
             }
-            if(this._textReader.peek().length > 0) {
+
+            if (this._textReader.peek().length > 0) {
                 this._timeout = window.setTimeout(this.window_setTimeout.bind(this), 100);
                 this._timeoutEnabled = true;
             } else {
                 this.addRecord(this._column, this._line, this._style, null);
             }
+
             this._textEditor.invalidateRange(new Textor.TextRange(startPosition, new Textor.TextPosition(this._line, this._column)));
             this._textEditor.update();
         };
+
         LanguageService.prototype.moveRange = function (oldPosition, newPosition) {
-            if(oldPosition.compareTo(newPosition) < 0) {
+            if (oldPosition.compareTo(newPosition) < 0) {
                 var index = 0;
-                while((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
+                while ((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
                     index++;
                 }
-                if(this._syntaxTable[oldPosition.line]) {
+                if (this._syntaxTable[oldPosition.line]) {
                     var syntax = this._syntaxTable[oldPosition.line].splice(index, this._syntaxTable[oldPosition.line].length - index);
-                    for(var i = 0; i < syntax.length; i++) {
+                    for (var i = 0; i < syntax.length; i++) {
                         syntax[i].start += newPosition.column - oldPosition.column;
                     }
                     var size = newPosition.line - oldPosition.line;
-                    if(size > 0) {
+                    if (size > 0) {
                         var newArray = new Array(size);
-                        for(var i = 0; i < size; i++) {
-                            newArray[i] = (index > 0) ? [
-                                {
-                                    style: this._syntaxTable[oldPosition.line][index - 1].style,
-                                    state: null,
-                                    start: 0
-                                }
-                            ] : [];
+                        for (var i = 0; i < size; i++) {
+                            newArray[i] = (index > 0) ? [{ style: this._syntaxTable[oldPosition.line][index - 1].style, state: null, start: 0 }] : [];
                         }
                         var tail = this._syntaxTable.splice(oldPosition.line + 1, this._syntaxTable.length - oldPosition.line + 1);
                         this._syntaxTable = this._syntaxTable.concat(newArray, tail);
                     }
                     this._syntaxTable[newPosition.line] = this._syntaxTable[newPosition.line].concat(syntax);
                 }
-            } else if(oldPosition.compareTo(newPosition) > 0) {
+            } else if (oldPosition.compareTo(newPosition) > 0) {
                 var index = 0;
-                if(oldPosition.line >= this._syntaxTable.length) {
+                if (oldPosition.line >= this._syntaxTable.length) {
                     oldPosition.line = this._syntaxTable.length - 1;
                     index = this._syntaxTable[oldPosition.line].length - 1;
                 } else {
-                    while((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
+                    while ((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
                         index++;
                     }
                 }
-                if(this._syntaxTable[oldPosition.line]) {
+                if (this._syntaxTable[oldPosition.line]) {
                     var syntax = this._syntaxTable[oldPosition.line].splice(index, this._syntaxTable[oldPosition.line].length - index);
-                    for(var i = 0; i < syntax.length; i++) {
+                    for (var i = 0; i < syntax.length; i++) {
                         syntax[i].start -= oldPosition.column - newPosition.column;
                     }
                     index = 0;
-                    while((this._syntaxTable[newPosition.line]) && (index < this._syntaxTable[newPosition.line].length) && (newPosition.column > this._syntaxTable[newPosition.line][index].start)) {
+                    while ((this._syntaxTable[newPosition.line]) && (index < this._syntaxTable[newPosition.line].length) && (newPosition.column > this._syntaxTable[newPosition.line][index].start)) {
                         index++;
                     }
                     this._syntaxTable.splice(newPosition.line + 1, oldPosition.line - newPosition.line);
@@ -213,52 +226,57 @@ var Textor;
                 }
             }
         };
+
         LanguageService.prototype.clearRange = function (startPosition, endPosition) {
-            if(startPosition.line === endPosition.line) {
+            if (startPosition.line === endPosition.line) {
                 var line = this._syntaxTable[startPosition.line];
-                if(line) {
+                if (line) {
                     var startIndex = -1;
-                    for(var i = 0; i < line.length; i++) {
-                        if(startIndex === -1 && startPosition.column >= line[i].start) {
+                    for (var i = 0; i < line.length; i++) {
+                        if (startIndex === -1 && startPosition.column >= line[i].start) {
                             startIndex = i;
                         }
-                        if(startIndex !== -1 && endPosition.column >= line[i].start) {
+                        if (startIndex !== -1 && endPosition.column >= line[i].start) {
                             this._syntaxTable[startPosition.line].splice(startIndex, i - startIndex);
                             break;
                         }
                     }
                 }
             } else {
-                if(this._syntaxTable[startPosition.line]) {
-                    for(var i = this._syntaxTable[startPosition.line].length - 1; i >= 0; i--) {
-                        if(this._syntaxTable[startPosition.line][i].start > startPosition.column) {
+                if (this._syntaxTable[startPosition.line]) {
+                    for (var i = this._syntaxTable[startPosition.line].length - 1; i >= 0; i--) {
+                        if (this._syntaxTable[startPosition.line][i].start > startPosition.column) {
                             this._syntaxTable[startPosition.line].splice(i, 1);
                         }
                     }
                 }
-                for(var i = startPosition.line + 1; i < endPosition.line; i++) {
+
+                for (var i = startPosition.line + 1; i < endPosition.line; i++) {
                     this._syntaxTable[i] = [];
                 }
-                if(this._syntaxTable[endPosition.line]) {
-                    for(var i = this._syntaxTable[endPosition.line].length - 1; i >= 0; i--) {
-                        if(this._syntaxTable[endPosition.line][i].start < endPosition.column) {
+
+                if (this._syntaxTable[endPosition.line]) {
+                    for (var i = this._syntaxTable[endPosition.line].length - 1; i >= 0; i--) {
+                        if (this._syntaxTable[endPosition.line][i].start < endPosition.column) {
                             this._syntaxTable[endPosition.line].splice(i, 1);
                         }
                     }
                 }
             }
         };
+
         LanguageService.prototype.addRecord = function (column, nextLine, style, state) {
             this._syntaxTable[this._line] = this._syntaxTable[this._line] || [];
-            if((this._index > 0) && ((this._index - 1) < this._syntaxTable[this._line].length) && (this._syntaxTable[this._line][this._index - 1].start === this._column)) {
+
+            if ((this._index > 0) && ((this._index - 1) < this._syntaxTable[this._line].length) && (this._syntaxTable[this._line][this._index - 1].start === this._column)) {
                 var current = this._syntaxTable[this._line][this._index - 1];
                 current.style = style;
-                if(state !== null) {
+                if (state !== null) {
                     current.state = state;
                 }
-            } else if(this._index < this._syntaxTable[this._line].length) {
+            } else if (this._index < this._syntaxTable[this._line].length) {
                 var current = this._syntaxTable[this._line][this._index];
-                if(column >= current.start) {
+                if (column >= current.start) {
                     current.start = column;
                     current.style = style;
                     current.state = state;
@@ -271,19 +289,22 @@ var Textor;
                 this._syntaxTable[this._line].push(new Textor.LanguageStyle(style, state, column));
                 this._index++;
             }
-            while(this._line < nextLine) {
+
+            while (this._line < nextLine) {
                 this._syntaxTable[this._line].splice(this._index, this._syntaxTable[this._line].length - this._index);
+
                 this._line++;
                 this._index = 0;
                 this.addRecord(0, this._line, style, null);
             }
         };
+
         LanguageService.prototype.log = function () {
-            for(var line = 0; line < this._syntaxTable.length; line++) {
+            for (var line = 0; line < this._syntaxTable.length; line++) {
                 var text = "line " + line + ": ";
-                if(this._syntaxTable[line]) {
+                if (this._syntaxTable[line]) {
                     text += "[ ";
-                    for(var i = 0; i < this._syntaxTable[line].length; i++) {
+                    for (var i = 0; i < this._syntaxTable[line].length; i++) {
                         text += this._syntaxTable[line][i].start + this._syntaxTable[line][i].style[0] + ((this._syntaxTable[line][i].state !== null) ? "X" : "-") + " ";
                     }
                     text += " ]";
@@ -294,7 +315,7 @@ var Textor;
         };
         return LanguageService;
     })();
-    Textor.LanguageService = LanguageService;    
+    Textor.LanguageService = LanguageService;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -306,7 +327,7 @@ var Textor;
         }
         return LanguageStyle;
     })();
-    Textor.LanguageStyle = LanguageStyle;    
+    Textor.LanguageStyle = LanguageStyle;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -320,7 +341,7 @@ var Textor;
         };
         return Point;
     })();
-    Textor.Point = Point;    
+    Textor.Point = Point;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -338,12 +359,13 @@ var Textor;
             var y2 = ((this.y + this.height) < (rectangle.y + rectangle.height)) ? (rectangle.y + rectangle.height) : (this.y + this.height);
             return new Rectangle(x1, y1, x2 - x1, y2 - y1);
         };
+
         Rectangle.prototype.toString = function () {
             return "(" + this.x + "," + this.y + ")-(" + this.width + "," + this.height + ")";
         };
         return Rectangle;
     })();
-    Textor.Rectangle = Rectangle;    
+    Textor.Rectangle = Rectangle;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -354,7 +376,7 @@ var Textor;
         }
         return SelectionChangeEvent;
     })();
-    Textor.SelectionChangeEvent = SelectionChangeEvent;    
+    Textor.SelectionChangeEvent = SelectionChangeEvent;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -367,9 +389,11 @@ var Textor;
         SelectionUndoUnit.prototype.undo = function () {
             this._textModel.selectRange(this._undoTextRange);
         };
+
         SelectionUndoUnit.prototype.redo = function () {
             this._textModel.selectRange(this._redoTextRange);
         };
+
         Object.defineProperty(SelectionUndoUnit.prototype, "isEmpty", {
             get: function () {
                 return false;
@@ -377,17 +401,20 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         SelectionUndoUnit.prototype.merge = function (undoUnit) {
-            if(undoUnit instanceof SelectionUndoUnit) {
+            if (undoUnit instanceof SelectionUndoUnit) {
                 var selectionUndoUnit = undoUnit;
                 this._redoTextRange = selectionUndoUnit.redoTextRange;
                 return true;
             }
             return false;
         };
+
         SelectionUndoUnit.prototype.toString = function () {
             return "Selection: " + this._redoTextRange.toString() + " => " + this._undoTextRange.toString();
         };
+
         Object.defineProperty(SelectionUndoUnit.prototype, "redoTextRange", {
             get: function () {
                 return this._redoTextRange;
@@ -397,7 +424,7 @@ var Textor;
         });
         return SelectionUndoUnit;
     })();
-    Textor.SelectionUndoUnit = SelectionUndoUnit;    
+    Textor.SelectionUndoUnit = SelectionUndoUnit;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -408,20 +435,18 @@ var Textor;
         }
         return Size;
     })();
-    Textor.Size = Size;    
+    Textor.Size = Size;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
     var TextBuffer = (function () {
         function TextBuffer() {
-            this._lines = [
-                ""
-            ];
+            this._lines = [""];
             this._textChangingHandlers = [];
             this._textChangedHandlers = [];
         }
         TextBuffer.prototype.addEventListener = function (type, callback) {
-            switch(type) {
+            switch (type) {
                 case "textchanging":
                     this._textChangingHandlers.push(callback);
                     break;
@@ -430,8 +455,9 @@ var Textor;
                     break;
             }
         };
+
         TextBuffer.prototype.removeEventListener = function (type, callback) {
-            switch(type) {
+            switch (type) {
                 case "textchanging":
                     this._textChangingHandlers.remove(callback);
                     break;
@@ -440,6 +466,7 @@ var Textor;
                     break;
             }
         };
+
         TextBuffer.prototype.setText = function (textRange, text) {
             var lines = text.split('\n');
             var lastLine = lines.length - 1;
@@ -451,8 +478,9 @@ var Textor;
             this.onTextChanged(new Textor.TextChangeEvent(textRange, newRange, text));
             return newRange;
         };
+
         TextBuffer.prototype.getText = function (textRange) {
-            if(textRange.start.line !== textRange.end.line) {
+            if (textRange.start.line !== textRange.end.line) {
                 var lines = [];
                 lines.push(this._lines[textRange.start.line].substring(textRange.start.column));
                 lines = lines.concat(this._lines.slice(textRange.start.line + 1, textRange.end.line));
@@ -461,31 +489,37 @@ var Textor;
             }
             return this._lines[textRange.start.line].substring(textRange.start.column, textRange.end.column);
         };
+
         TextBuffer.prototype.getTextRange = function () {
             return new Textor.TextRange(new Textor.TextPosition(0, 0), new Textor.TextPosition(this._lines.length - 1, this._lines[this._lines.length - 1].length));
         };
+
         TextBuffer.prototype.getLines = function () {
             return this._lines.length;
         };
+
         TextBuffer.prototype.getColumns = function (line) {
             return this._lines[line].length;
         };
+
         TextBuffer.prototype.getLine = function (line) {
             return this._lines[line];
         };
+
         TextBuffer.prototype.onTextChanged = function (e) {
-            for(var i = 0; i < this._textChangedHandlers.length; i++) {
+            for (var i = 0; i < this._textChangedHandlers.length; i++) {
                 this._textChangedHandlers[i](e);
             }
         };
+
         TextBuffer.prototype.onTextChanging = function (e) {
-            for(var i = 0; i < this._textChangingHandlers.length; i++) {
+            for (var i = 0; i < this._textChangingHandlers.length; i++) {
                 this._textChangingHandlers[i](e);
             }
         };
         return TextBuffer;
     })();
-    Textor.TextBuffer = TextBuffer;    
+    Textor.TextBuffer = TextBuffer;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -497,7 +531,7 @@ var Textor;
         }
         return TextChangeEvent;
     })();
-    Textor.TextChangeEvent = TextChangeEvent;    
+    Textor.TextChangeEvent = TextChangeEvent;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -506,10 +540,12 @@ var Textor;
             var _this = this;
             this._textEditor = textEditor;
             this._canvas = canvas;
+
             this._isWebKit = typeof navigator.userAgent.split("WebKit/")[1] !== "undefined";
             this._isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
             this._isMozilla = navigator.appVersion.indexOf('Gecko/') >= 0 || ((navigator.userAgent.indexOf("Gecko") >= 0) && !this._isWebKit && (typeof navigator.appVersion !== "undefined"));
             this._isMac = /Mac/.test(navigator.userAgent);
+
             this._textArea = document.createElement("textarea");
             this._textArea.style.position = "absolute";
             this._textArea.style.top = "0";
@@ -527,6 +563,7 @@ var Textor;
             this._textArea.value = ".";
             document.body.appendChild(this._textArea);
             this.updateTextAreaPosition();
+
             this._canvas_mouseDownHandler = function (e) {
                 _this.canvas_mouseDown(e);
             };
@@ -581,6 +618,7 @@ var Textor;
             this._textArea_beforeCopyHandler = function (e) {
                 _this.textArea_beforeCopy(e);
             };
+
             this._canvas.addEventListener("focus", this._canvas_focusHandler, false);
             this._canvas.addEventListener(("onmousewheel" in this._canvas) ? "mousewheel" : "DOMMouseScroll", this._canvas_mouseWheelHandler, false);
             this._canvas.addEventListener("touchstart", this._canvas_touchStartHandler, false);
@@ -589,6 +627,7 @@ var Textor;
             this._canvas.addEventListener("mousedown", this._canvas_mouseDownHandler, false);
             window.addEventListener("mousemove", this._window_mouseMoveHandler, false);
             window.addEventListener("mouseup", this._window_mouseUpHandler, false);
+
             this._textArea.addEventListener("focus", this._textArea_focusHandler, false);
             this._textArea.addEventListener("blur", this._textArea_blurHandler, false);
             this._textArea.addEventListener("cut", this._textArea_cutHandler, false);
@@ -620,18 +659,22 @@ var Textor;
             this._textArea.removeEventListener("keyup", this._textArea_keyUpHandler);
             this._textArea.removeEventListener("keydown", this._textArea_keyDownHandler);
         };
+
         TextController.prototype.isFocused = function () {
             return new RegExp("(^|\\s+)" + "focus" + "(\\s+|$)").test(this._canvas.className);
         };
+
         TextController.prototype.focus = function () {
             this._textArea.focus();
         };
+
         TextController.prototype.copy = function (text) {
-            if(this._isMozilla || this._isWebKit) {
+            if (this._isMozilla || this._isWebKit) {
                 this._textArea.value = text;
                 this._textArea.select();
             }
         };
+
         Object.defineProperty(TextController.prototype, "isMozilla", {
             get: function () {
                 return this._isMozilla;
@@ -639,133 +682,162 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextController.prototype.textArea_cut = function (e) {
             this._textEditor.cut();
         };
+
         TextController.prototype.textArea_copy = function (e) {
             this._textEditor.copy();
         };
+
         TextController.prototype.textArea_paste = function (e) {
-            if(this._isMozilla) {
+            if (this._isMozilla) {
                 this._textArea.value = "";
                 window.setTimeout(function () {
                     var text = this._textArea.value;
-                    if(text.length > 0) {
+                    if (text.length > 0) {
                         this._textEditor.paste(text);
                     }
                 }.bind(this), 1);
-            } else if(this._isWebKit) {
+            } else if (this._isWebKit) {
                 var text = e.clipboardData.getData("text/plain");
                 this._textEditor.paste(text);
                 this.stopEvent(e);
             }
         };
+
         TextController.prototype.textArea_beforeCut = function (e) {
             this._textEditor.copy();
         };
+
         TextController.prototype.textArea_beforeCopy = function (e) {
             this._textEditor.copy();
         };
+
         TextController.prototype.textArea_focus = function (e) {
-            if(!this.isFocused()) {
+            if (!this.isFocused()) {
                 this._canvas.className += " focus";
             }
+
             this._textArea.select();
             this._textEditor.invalidate();
             this._textEditor.update();
         };
+
         TextController.prototype.textArea_blur = function (e) {
-            if(this.isFocused()) {
+            if (this.isFocused()) {
                 this._canvas.className = this._canvas.className.replace(new RegExp(" focus\\b"), "");
             }
             this._textEditor.invalidate();
         };
+
         TextController.prototype.canvas_focus = function (e) {
             this._textEditor.focus();
         };
+
         TextController.prototype.canvas_mouseDown = function (e) {
             this._textEditor.focus();
+
             this.stopEvent(e);
             this.updatePointerPosition(e.pageX, e.pageY);
+
             var position = this.getTextPosition();
+
             var clicks = ((e.detail - 1) % 3) + 1;
-            if(clicks === 1) {
-                if(!e.shiftKey) {
+            if (clicks === 1) {
+                if (!e.shiftKey) {
                     this.pointerDown();
                 } else {
                     this._textEditor.selectTo(position.line, position.column);
                 }
+
                 this._mouseCapture = true;
                 this.startScrollTimer();
-            } else if(clicks === 2) {
+            } else if (clicks === 2) {
                 this._textEditor.selectWord(position.line, position.column);
                 this._mouseCapture = true;
                 this.startScrollTimer();
-            } else if(clicks === 3) {
+            } else if (clicks === 3) {
                 this._textEditor.selectRange(position.line, 0, position.line + 1, 0);
             }
+
             this.updateMouseCursor();
         };
+
         TextController.prototype.window_mouseUp = function (e) {
             e.preventDefault();
             this.updatePointerPosition(e.pageX, e.pageY);
             this.pointerUp();
         };
+
         TextController.prototype.window_mouseMove = function (e) {
             e.preventDefault();
             this.updatePointerPosition(e.pageX, e.pageY);
             this.pointerMove();
         };
+
         TextController.prototype.canvas_mouseWheel = function (e) {
             e.preventDefault();
+
             var delta = 0;
-            if(!e) {
+
+            if (!e) {
                 delta = window.event.wheelDelta / 120;
             }
-            if(e.wheelDelta) {
+
+            if (e.wheelDelta) {
                 delta = e.wheelDelta / 120;
-            } else if(e.detail) {
+            } else if (e.detail) {
                 delta = -e.detail / 3;
             }
-            if(delta !== 0) {
+
+            if (delta !== 0) {
                 this._textEditor.scroll(Math.floor(-delta), 0);
                 this._textEditor.update();
             }
         };
+
         TextController.prototype.canvas_touchStart = function (e) {
             this._textEditor.focus();
-            if(e.touches.length === 1) {
+            if (e.touches.length === 1) {
                 e.preventDefault();
                 this.updatePointerPosition(e.touches[0].pageX, e.touches[0].pageY);
                 this.pointerDown();
             }
         };
+
         TextController.prototype.canvas_touchMove = function (e) {
-            if(e.touches.length === 1) {
+            if (e.touches.length === 1) {
                 e.preventDefault();
                 this.updatePointerPosition(e.touches[0].pageX, e.touches[0].pageY);
                 this.pointerMove();
             }
         };
+
         TextController.prototype.canvas_touchEnd = function (e) {
             e.preventDefault();
             this.pointerUp();
         };
+
         TextController.prototype.textArea_keyUp = function (e) {
             e.preventDefault();
         };
+
         TextController.prototype.textArea_keyDown = function (e) {
-            if(!this._isMozilla) {
-                if(this.processKey(e.keyCode, e.shiftKey, e.ctrlKey, e.altKey, e.metaKey)) {
+            if (!this._isMozilla) {
+                if (this.processKey(e.keyCode, e.shiftKey, e.ctrlKey, e.altKey, e.metaKey)) {
                     this._textEditor.update();
                     this.stopEvent(e);
                 }
             }
         };
+
         TextController.prototype.textArea_keyPress = function (e) {
             var keyCode;
-            if(this._isMozilla) {
-                if(!(this._keyCodeTable)) {
+
+            if (this._isMozilla) {
+                if (!(this._keyCodeTable)) {
                     this._keyCodeTable = [];
                     var charCodeTable = {
                         32: ' ',
@@ -819,22 +891,25 @@ var Textor;
                         221: ']',
                         222: '\"'
                     };
-                    for(keyCode in charCodeTable) {
+
+                    for (keyCode in charCodeTable) {
                         var key = charCodeTable[keyCode];
                         this._keyCodeTable[key.charCodeAt(0)] = parseInt(keyCode);
-                        if(key.toUpperCase() != key) {
+                        if (key.toUpperCase() != key) {
                             this._keyCodeTable[key.toUpperCase().charCodeAt(0)] = parseInt(keyCode);
                         }
                     }
                 }
+
                 keyCode = ((e.charCode !== 0) && (this._keyCodeTable[e.charCode])) ? this._keyCodeTable[e.charCode] : e.keyCode;
-                if(this.processKey(keyCode, e.shiftKey, e.ctrlKey, e.altKey, e.metaKey)) {
+                if (this.processKey(keyCode, e.shiftKey, e.ctrlKey, e.altKey, e.metaKey)) {
                     this._textEditor.update();
                     this.stopEvent(e);
                     return;
                 }
             }
-            if(!e.ctrlKey && !e.altKey && !e.metaKey && e.charCode !== 0) {
+
+            if (!e.ctrlKey && !e.altKey && !e.metaKey && e.charCode !== 0) {
                 this.stopEvent(e);
                 var text = String.fromCharCode(e.charCode);
                 this._textEditor.insertText(text);
@@ -842,55 +917,65 @@ var Textor;
                 this._textEditor.update();
             }
         };
+
         TextController.prototype.mouseScroll = function () {
             var textPosition = this.getTextPosition();
             this._textEditor.selectTo(textPosition.line, textPosition.column);
             this._textEditor.updateScrollPosition();
             this._textEditor.update();
         };
+
         TextController.prototype.mouseScroll_interval = function () {
             var textPosition = this.getTextCoordinate();
             var size = this._textEditor.size;
-            if((textPosition.line < 0) || (textPosition.line >= size.line) || (textPosition.column < 0) || (textPosition.column >= size.column)) {
+            if ((textPosition.line < 0) || (textPosition.line >= size.line) || (textPosition.column < 0) || (textPosition.column >= size.column)) {
                 this.mouseScroll();
             }
         };
+
         TextController.prototype.pointerDown = function () {
             var textPosition = this.getTextPosition();
             this._textEditor.select(textPosition.line, textPosition.column);
         };
+
         TextController.prototype.pointerMove = function () {
-            if(this._mouseCapture) {
+            if (this._mouseCapture) {
                 this.mouseScroll();
             }
             this.updateMouseCursor();
         };
+
         TextController.prototype.pointerUp = function () {
             this._mouseCapture = false;
             this.stopScrollTimer();
             this.updateMouseCursor();
         };
+
         TextController.prototype.startScrollTimer = function () {
             this.stopScrollTimer();
             this._scrollTimer = window.setInterval(this.mouseScroll_interval.bind(this), 75);
         };
+
         TextController.prototype.stopScrollTimer = function () {
-            if(this._scrollTimer !== null) {
+            if (this._scrollTimer !== null) {
                 window.clearInterval(this._scrollTimer);
                 this._scrollTimer = null;
             }
         };
+
         TextController.prototype.stopEvent = function (e) {
             e.preventDefault();
             e.stopPropagation();
         };
+
         TextController.prototype.updateMouseCursor = function () {
             this._canvas.style.cursor = "text";
         };
+
         TextController.prototype.updateTextAreaPosition = function () {
             var point = new Textor.Point(0, 0);
             var node = this._canvas;
-            while(node !== null) {
+            while (node !== null) {
                 point.x += node.offsetLeft;
                 point.y += node.offsetTop;
                 node = node.offsetParent;
@@ -898,49 +983,54 @@ var Textor;
             this._textArea.style.top = point.y + "px";
             this._textArea.style.left = point.x + "px";
         };
+
         TextController.prototype.updatePointerPosition = function (x, y) {
             this._pointerPosition = new Textor.Point(x, y);
             var node = this._canvas;
-            while(node !== null) {
+            while (node !== null) {
                 this._pointerPosition.x -= node.offsetLeft;
                 this._pointerPosition.y -= node.offsetTop;
                 node = node.offsetParent;
             }
         };
+
         TextController.prototype.getTextCoordinate = function () {
             var x = this._pointerPosition.x + (this._textEditor.fontSize.width / 2);
             var y = this._pointerPosition.y;
             return this._textEditor.getTextPosition(new Textor.Point(x, y));
         };
+
         TextController.prototype.getTextPosition = function () {
             var textPosition = this.getTextCoordinate();
             textPosition.line += this._textEditor.scrollPosition.line;
             textPosition.column += this._textEditor.scrollPosition.column;
             return textPosition;
         };
+
         TextController.prototype.processKey = function (keyCode, shiftKey, ctrlKey, altKey, metaKey) {
-            if(this._isMac) {
-                if(ctrlKey && !shiftKey && !altKey && !metaKey) {
-                    if(keyCode === 65) {
+            if (this._isMac) {
+                if (ctrlKey && !shiftKey && !altKey && !metaKey) {
+                    if (keyCode === 65) {
                         ctrlKey = false;
                         keyCode = 36;
-                    } else if(keyCode === 69) {
+                    } else if (keyCode === 69) {
                         ctrlKey = false;
                         keyCode = 35;
                     }
-                } else if(metaKey && keyCode === 37) {
+                } else if (metaKey && keyCode === 37) {
                     metaKey = false;
                     keyCode = 36;
-                } else if(metaKey && keyCode === 39) {
+                } else if (metaKey && keyCode === 39) {
                     metaKey = false;
                     keyCode = 35;
                 }
             }
+
             return this._textEditor.processKey(keyCode, shiftKey, ctrlKey, altKey, metaKey);
         };
         return TextController;
     })();
-    Textor.TextController = TextController;    
+    Textor.TextController = TextController;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -958,6 +1048,7 @@ var Textor;
             this._blinkState = true;
             this._canvas = canvas;
             this._context = canvas.getContext("2d");
+
             this._textBuffer_textChanging = function (e) {
                 _this.textBuffer_textChanging(e);
             };
@@ -967,14 +1058,19 @@ var Textor;
             this._textModel_selectionChanged = function (e) {
                 _this.textModel_selectionChanged(e);
             };
+
             this._textBuffer = new Textor.TextBuffer();
             this._textBuffer.addEventListener("textchanging", this._textBuffer_textChanging);
             this._textBuffer.addEventListener("textchanged", this._textBuffer_textChanged);
+
             this._textModel = new Textor.TextModel(this._undoService, this._textBuffer);
             this._textModel.addEventListener("selectionchanged", this._textModel_selectionChanged);
             this._textModel.tabSize = 4;
+
             this._textController = new Textor.TextController(this, this._canvas);
+
             this._languageService = new Textor.LanguageService(this);
+
             this._theme = {
                 "fontFamily": "Monaco,Lucida Console,Courier New",
                 "fontSize": "12",
@@ -996,6 +1092,7 @@ var Textor;
                 "errorStyle": "#FF0000 bold",
                 "declarationStyle": "#000000 bold"
             };
+
             this.updateFont();
             this.invalidate();
             this.update();
@@ -1010,8 +1107,9 @@ var Textor;
             this._textChangedHandlers = [];
             this._selectionChangedHandlers = [];
         };
+
         TextEditor.prototype.addEventListener = function (type, callback) {
-            switch(type) {
+            switch (type) {
                 case "textchanging":
                     this._textChangingHandlers.push(callback);
                     break;
@@ -1023,8 +1121,9 @@ var Textor;
                     break;
             }
         };
+
         TextEditor.prototype.removeEventListener = function (type, callback) {
-            switch(type) {
+            switch (type) {
                 case "textchanging":
                     this._textChangingHandlers.remove(callback);
                     break;
@@ -1036,15 +1135,17 @@ var Textor;
                     break;
             }
         };
+
+
         Object.defineProperty(TextEditor.prototype, "theme", {
             get: function () {
                 return this._theme;
             },
             set: function (value) {
                 var propertyName;
-                for(propertyName in value) {
+                for (propertyName in value) {
                     this._theme[propertyName] = value[propertyName];
-                    if(propertyName === "fontFamily" || propertyName === "fontSize") {
+                    if (propertyName === "fontFamily" || propertyName === "fontSize") {
                         this.updateFont();
                     }
                 }
@@ -1054,6 +1155,7 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         Object.defineProperty(TextEditor.prototype, "language", {
             get: function () {
                 return this._languageService.language;
@@ -1064,6 +1166,8 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
+
         Object.defineProperty(TextEditor.prototype, "tabSize", {
             get: function () {
                 return this._textModel.tabSize;
@@ -1076,9 +1180,13 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
+
         TextEditor.prototype.focus = function () {
             this._textController.focus();
         };
+
+
         Object.defineProperty(TextEditor.prototype, "text", {
             get: function () {
                 return this._textBuffer.getText(this._textBuffer.getTextRange());
@@ -1094,28 +1202,34 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextEditor.prototype.insertText = function (text) {
             this._textModel.insertText(text);
         };
+
         TextEditor.prototype.deleteSelection = function () {
             this._textModel.deleteSelection(null);
         };
+
         TextEditor.prototype.select = function (line, column) {
-            if(line > (this._textBuffer.getLines() - 1)) {
+            if (line > (this._textBuffer.getLines() - 1)) {
                 line = this._textBuffer.getLines() - 1;
-                if(column > (this._textBuffer.getColumns(line) - 1)) {
+                if (column > (this._textBuffer.getColumns(line) - 1)) {
                     column = this._textBuffer.getColumns(line) - 1;
                 }
             }
+
             var textPosition = new Textor.TextPosition(line, column);
             var startPosition = this._textModel.toScreenPosition(this._textModel.toBufferPosition(textPosition));
             var endPosition = this._textModel.toScreenPosition(this._textModel.toBufferPosition(textPosition));
+
             this._undoService.begin();
             this._undoService.add(new Textor.SelectionUndoUnit(this._textModel, new Textor.TextRange(startPosition, endPosition)));
             this._undoService.commit();
             this.updateScrollPosition();
             this.update();
         };
+
         TextEditor.prototype.selectRange = function (startLine, startColumn, endLine, endColumn) {
             this._undoService.begin();
             this._undoService.add(new Textor.SelectionUndoUnit(this._textModel, new Textor.TextRange(new Textor.TextPosition(startLine, startColumn), new Textor.TextPosition(endLine, endColumn))));
@@ -1123,25 +1237,28 @@ var Textor;
             this.updateScrollPosition();
             this.update();
         };
+
         TextEditor.prototype.selectAll = function () {
             this._undoService.begin();
             this._undoService.add(new Textor.SelectionUndoUnit(this._textModel, this._textModel.toScreenRange(this._textBuffer.getTextRange())));
             this._undoService.commit();
             this.update();
         };
+
         TextEditor.prototype.selectTo = function (line, column) {
             var textPosition = new Textor.TextPosition(line, column);
-            if(textPosition.line < 0) {
+            if (textPosition.line < 0) {
                 textPosition.line = 0;
             }
-            if(textPosition.line >= this._textBuffer.getLines()) {
+            if (textPosition.line >= this._textBuffer.getLines()) {
                 textPosition.line = this._textBuffer.getLines() - 1;
             }
-            if(textPosition.column < 0) {
+            if (textPosition.column < 0) {
                 textPosition.column = 0;
             }
+
             textPosition = this._textModel.toScreenPosition(this._textModel.toBufferPosition(textPosition));
-            if(!this._textModel.textRange.end.equals(textPosition)) {
+            if (!this._textModel.textRange.end.equals(textPosition)) {
                 this._undoService.begin();
                 this._undoService.add(new Textor.SelectionUndoUnit(this._textModel, new Textor.TextRange(this._textModel.textRange.start.clone(), textPosition)));
                 this._undoService.commit();
@@ -1149,37 +1266,41 @@ var Textor;
                 this.update();
             }
         };
+
         TextEditor.prototype.selectWord = function (line, column) {
             var textPosition = this._textModel.toBufferPosition(new Textor.TextPosition(line, column));
             var text = this._textBuffer.getLine(textPosition.line);
             var startColumn = this._textModel.findWordBreak(text, textPosition.column + 1, -1);
             var endColumn = this._textModel.findWordBreak(text, textPosition.column, 1);
             var textRange = new Textor.TextRange(new Textor.TextPosition(textPosition.line, startColumn), new Textor.TextPosition(textPosition.line, endColumn));
+
             this._undoService.begin();
             this._undoService.add(new Textor.SelectionUndoUnit(this._textModel, this._textModel.toScreenRange(textRange)));
             this._undoService.commit();
             this.update();
         };
+
         TextEditor.prototype.scroll = function (vertical, horizontal) {
             this._scrollPosition.line += vertical;
             this._scrollPosition.column += horizontal;
             var size = this.size;
             var maxLine = ((this._textBuffer.getLines() - size.line) < 0) ? 0 : this._textBuffer.getLines() - size.line;
             var maxColumn = ((this.getMaxColumns() - size.column + 1) < 0) ? 0 : this.getMaxColumns() - size.column + 1;
-            if(this._scrollPosition.line < 0) {
+            if (this._scrollPosition.line < 0) {
                 this._scrollPosition.line = 0;
             }
-            if(this._scrollPosition.line > maxLine) {
+            if (this._scrollPosition.line > maxLine) {
                 this._scrollPosition.line = maxLine;
             }
-            if(this._scrollPosition.column < 0) {
+            if (this._scrollPosition.column < 0) {
                 this._scrollPosition.column = 0;
             }
-            if(this._scrollPosition.column > maxColumn) {
+            if (this._scrollPosition.column > maxColumn) {
                 this._scrollPosition.column = maxColumn;
             }
             this.invalidate();
         };
+
         Object.defineProperty(TextEditor.prototype, "scrollPosition", {
             get: function () {
                 return this._scrollPosition;
@@ -1187,145 +1308,154 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextEditor.prototype.undo = function () {
             this._undoService.undo();
             this.updateScrollPosition();
             this.update();
         };
+
         TextEditor.prototype.redo = function () {
             this._undoService.redo();
             this.updateScrollPosition();
             this.update();
         };
+
         TextEditor.prototype.cut = function () {
             this.copy();
             this.deleteSelection();
             this.updateScrollPosition();
             this.update();
         };
+
         TextEditor.prototype.copy = function () {
             var textRange = this._textModel.toBufferRange(this._textModel.getTextRange());
-            if(!textRange.isEmpty) {
+            if (!textRange.isEmpty) {
                 var text = this._textBuffer.getText(textRange);
-                if(window.clipboardData && window.clipboardData.getData) {
+
+                if (window.clipboardData && window.clipboardData.getData) {
                     window.clipboardData.setData("Text", text);
                 } else {
                     this._textController.copy(text);
                 }
             }
         };
+
         TextEditor.prototype.paste = function (text) {
-            if(text) {
+            if (text) {
                 this.insertText(text);
                 this.updateScrollPosition();
                 this.update();
             }
         };
+
         TextEditor.prototype.createTextReader = function () {
             return new Textor.TextReader(this._textBuffer);
         };
+
         TextEditor.prototype.processKey = function (keyCode, shiftKey, ctrlKey, altKey, metaKey) {
-            if((ctrlKey || metaKey) && !altKey) {
-                if(keyCode === 65) {
+            if ((ctrlKey || metaKey) && !altKey) {
+                if (keyCode === 65) {
                     this.selectAll();
                     return true;
-                } else if(keyCode === 88) {
-                    if(window.clipboardData && window.clipboardData.setData) {
+                } else if (keyCode === 88) {
+                    if (window.clipboardData && window.clipboardData.setData) {
                         this.cut();
                         return true;
                     }
-                } else if(keyCode === 67) {
-                    if(window.clipboardData && window.clipboardData.setData) {
+                } else if (keyCode === 67) {
+                    if (window.clipboardData && window.clipboardData.setData) {
                         this.copy();
                         return true;
                     }
-                } else if(keyCode === 86) {
-                    if(window.clipboardData && window.clipboardData.getData) {
+                } else if (keyCode === 86) {
+                    if (window.clipboardData && window.clipboardData.getData) {
                         var text = window.clipboardData.getData("Text");
-                        if(text) {
+                        if (text) {
                             this.paste(text);
                             return true;
                         }
                     }
-                } else if((keyCode === 90) && (!shiftKey)) {
+                } else if ((keyCode === 90) && (!shiftKey)) {
                     this.undo();
                     return true;
-                } else if(((keyCode === 90) && (shiftKey)) || (keyCode === 89)) {
+                } else if (((keyCode === 90) && (shiftKey)) || (keyCode === 89)) {
                     this.redo();
                     return true;
                 }
             }
-            if(!metaKey && !altKey) {
-                if(keyCode === 37) {
+
+            if (!metaKey && !altKey) {
+                if (keyCode === 37) {
                     this._textModel.moveCursor("column", !ctrlKey ? "1" : "word", "previous", shiftKey);
                     this.updateScrollPosition();
                     return true;
-                } else if(keyCode === 39) {
+                } else if (keyCode === 39) {
                     this._textModel.moveCursor("column", !ctrlKey ? "1" : "word", "next", shiftKey);
                     this.updateScrollPosition();
                     return true;
-                } else if(keyCode === 38) {
-                    if(!ctrlKey) {
+                } else if (keyCode === 38) {
+                    if (!ctrlKey) {
                         this._textModel.moveCursor("line", "1", "previous", shiftKey);
                         this.updateScrollPosition();
                     } else {
                         this.scroll(-1, 0);
                     }
                     return true;
-                } else if(keyCode === 40) {
-                    if(!ctrlKey) {
+                } else if (keyCode === 40) {
+                    if (!ctrlKey) {
                         this._textModel.moveCursor("line", "1", "next", shiftKey);
                         this.updateScrollPosition();
                     } else {
                         this.scroll(+1, 0);
                     }
                     return true;
-                } else if(!ctrlKey) {
-                    if(keyCode === 8) {
+                } else if (!ctrlKey) {
+                    if (keyCode === 8) {
                         this._textModel.deleteSelection("previous");
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 9) {
+                    } else if (keyCode === 9) {
                         this.insertText("\t");
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 13) {
+                    } else if (keyCode === 13) {
                         this.insertText("\n" + this._textModel.getIndent());
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 45) {
+                    } else if (keyCode === 45) {
                         this._textModel.insertText(" ");
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 46) {
+                    } else if (keyCode === 46) {
                         this._textModel.deleteSelection("next");
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 32) {
+                    } else if (keyCode === 32) {
                         this.insertText(" ");
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 33) {
-                        if(shiftKey) {
+                    } else if (keyCode === 33) {
+                        if (shiftKey) {
                             this._textModel.moveCursor("line", this.size.line.toString(), "previous", shiftKey);
                             this.updateScrollPosition();
                         } else {
                             this.scroll(-this.size.line, 0);
                         }
                         return true;
-                    } else if(keyCode === 34) {
-                        if(shiftKey) {
+                    } else if (keyCode === 34) {
+                        if (shiftKey) {
                             this._textModel.moveCursor("line", this.size.line.toString(), "next", shiftKey);
                             this.updateScrollPosition();
                         } else {
                             this.scroll(+this.size.line, 0);
                         }
                         return true;
-                    } else if(keyCode === 35) {
+                    } else if (keyCode === 35) {
                         this._textModel.moveCursor("column", "boundary", "next", shiftKey);
                         this.updateScrollPosition();
                         return true;
-                    } else if(keyCode === 36) {
+                    } else if (keyCode === 36) {
                         this._textModel.moveCursor("column", "boundary", "previous", shiftKey);
                         this.updateScrollPosition();
                         return true;
@@ -1333,50 +1463,59 @@ var Textor;
                 }
             }
         };
+
         TextEditor.prototype.updateScrollPosition = function () {
             var size = this.size;
             size.line--;
             size.column--;
+
             var textRange = this._textModel.textRange;
             var selection = textRange.end.clone();
-            if(selection.line > this._textBuffer.getLines() - 1) {
+            if (selection.line > this._textBuffer.getLines() - 1) {
                 selection.line = this._textBuffer.getLines() - 1;
             }
             var maxPosition = this._textModel.toScreenPosition(new Textor.TextPosition(selection.line, this._textBuffer.getColumns(selection.line)));
-            if(selection.column > maxPosition.column - 1) {
+            if (selection.column > maxPosition.column - 1) {
                 selection.column = maxPosition.column - 1;
             }
             selection.line -= this._scrollPosition.line;
             selection.column -= this._scrollPosition.column;
+
             var vertical = 0;
             var horizontal = 0;
-            if(selection.line < 0) {
+
+            if (selection.line < 0) {
                 vertical = selection.line;
-            } else if(selection.line > size.line) {
+            } else if (selection.line > size.line) {
                 vertical = selection.line - size.line;
             }
-            if(selection.column < 5) {
+
+            if (selection.column < 5) {
                 horizontal = selection.column - 5;
-                if(this._scrollPosition.column + horizontal < 0) {
+                if (this._scrollPosition.column + horizontal < 0) {
                     horizontal = -this._scrollPosition.column;
                 }
-            } else if(selection.column > (size.column - 5)) {
+            } else if (selection.column > (size.column - 5)) {
                 horizontal = selection.column - size.column + 5;
+
                 var maxColumns = this.getMaxColumns();
-                if(this._scrollPosition.column + horizontal + size.column > maxColumns + 1) {
+                if (this._scrollPosition.column + horizontal + size.column > maxColumns + 1) {
                     horizontal = maxColumns - size.column - this._scrollPosition.column + 1;
                 }
             }
-            if((horizontal !== 0) || (vertical !== 0)) {
+
+            if ((horizontal !== 0) || (vertical !== 0)) {
                 this.scroll(vertical, horizontal);
             }
         };
+
         TextEditor.prototype.updateFont = function () {
             this._context.font = this._theme.fontSize + "px " + this._theme.fontFamily;
             var width = this._context.measureText("XXXXXXXXXXXXXXXXXXXX").width / 20;
             var height = Math.floor(parseFloat(this._theme.fontSize) * 1.5);
             this._fontSize = new Textor.Size(width, height);
         };
+
         Object.defineProperty(TextEditor.prototype, "fontSize", {
             get: function () {
                 return this._fontSize;
@@ -1384,6 +1523,7 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         Object.defineProperty(TextEditor.prototype, "size", {
             get: function () {
                 return this.getTextPosition(new Textor.Point(this._canvas.width, this._canvas.height));
@@ -1391,6 +1531,7 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextEditor.prototype.getTextPosition = function (point) {
             var paddingLeft = parseFloat(this._theme.paddingLeft);
             var paddingTop = parseFloat(this._theme.paddingTop);
@@ -1398,40 +1539,48 @@ var Textor;
             var line = Math.floor((point.y - paddingTop) / this.fontSize.height);
             return new Textor.TextPosition(line, column);
         };
+
         TextEditor.prototype.getMaxColumns = function () {
-            if(this._maxColumns === -1) {
-                for(var line = 0; line < this._textBuffer.getLines(); line++) {
+            if (this._maxColumns === -1) {
+                for (var line = 0; line < this._textBuffer.getLines(); line++) {
                     var length = this._textModel.getColumns(line);
-                    if(this._maxColumns < length) {
+                    if (this._maxColumns < length) {
                         this._maxColumns = length;
                     }
                 }
             }
             return this._maxColumns;
         };
+
         TextEditor.prototype.invalidate = function () {
             this.invalidateRectangle(new Textor.Rectangle(0, 0, this._canvas.width, this._canvas.height));
         };
+
         TextEditor.prototype.invalidateSelection = function (textRange) {
             this.invalidateRange(textRange);
+
             var paddingLeft = parseFloat(this._theme.paddingLeft);
             var paddingTop = parseFloat(this._theme.paddingTop);
             var fontSize = this.fontSize;
             var rectangle = new Textor.Rectangle(0, ((textRange.end.line - this._scrollPosition.line) * fontSize.height) + paddingTop, this._canvas.width, fontSize.height);
             this.invalidateRectangle(rectangle);
         };
+
         TextEditor.prototype.invalidateRange = function (textRange) {
             var fontSize = this.fontSize;
             var paddingLeft = parseFloat(this._theme.paddingLeft);
             var paddingTop = parseFloat(this._theme.paddingTop);
+
             var range = textRange.normalize();
             range.start.line -= this._scrollPosition.line;
             range.end.line -= this._scrollPosition.line;
             range.start.column -= this._scrollPosition.column;
             range.end.column -= this._scrollPosition.column;
+
             var x = paddingLeft;
             var y = paddingTop + (range.start.line * fontSize.height);
-            if(textRange.start.line === textRange.end.line) {
+
+            if (textRange.start.line === textRange.end.line) {
                 x += range.start.column * fontSize.width;
                 var width = (range.end.column - range.start.column) * fontSize.width;
                 this.invalidateRectangle(new Textor.Rectangle(x, y, width, fontSize.height));
@@ -1440,116 +1589,125 @@ var Textor;
                 this.invalidateRectangle(new Textor.Rectangle(x, y, this._canvas.width, height));
             }
         };
+
         TextEditor.prototype.invalidateRectangle = function (rectangle) {
-            if(rectangle.x < 0) {
+            if (rectangle.x < 0) {
                 rectangle.x = 0;
             }
-            if(rectangle.y < 0) {
+            if (rectangle.y < 0) {
                 rectangle.y = 0;
             }
-            if((rectangle.x + rectangle.width) > this._canvas.width) {
+            if ((rectangle.x + rectangle.width) > this._canvas.width) {
                 rectangle.width = this._canvas.width - rectangle.x;
             }
-            if((rectangle.y + rectangle.height) > this._canvas.height) {
+            if ((rectangle.y + rectangle.height) > this._canvas.height) {
                 rectangle.height = this._canvas.height - rectangle.y;
             }
             this._invalidRectangles.push(rectangle);
         };
+
         TextEditor.prototype.update = function () {
-            if(this._invalidRectangles.length !== 0) {
+            if (this._invalidRectangles.length !== 0) {
                 var clipRectangle = this._invalidRectangles[0];
-                for(var i = 1; i < this._invalidRectangles.length; i++) {
+                for (var i = 1; i < this._invalidRectangles.length; i++) {
                     clipRectangle = clipRectangle.union(this._invalidRectangles[i]);
                 }
-                if((clipRectangle.width !== 0) && (clipRectangle.height !== 0)) {
+                if ((clipRectangle.width !== 0) && (clipRectangle.height !== 0)) {
                     this._context.save();
+
                     this._context.beginPath();
                     this._context.rect(clipRectangle.x, clipRectangle.y, clipRectangle.width, clipRectangle.height);
                     this._context.clip();
+
                     var focused = this._textController.isFocused();
+
                     this._context.fillStyle = focused ? this._theme.backgroundColor : this._theme.backgroundBlurColor;
                     this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
+
                     var size = this.size;
                     var fontSize = this.fontSize;
                     var paddingLeft = parseFloat(this._theme.paddingLeft);
                     var paddingTop = parseFloat(this._theme.paddingTop);
+
                     var selection = this._textModel.getTextRange();
                     selection.start.line -= this._scrollPosition.line;
                     selection.end.line -= this._scrollPosition.line;
                     selection.start.column -= this._scrollPosition.column;
                     selection.end.column -= this._scrollPosition.column;
-                    if(this._textModel.isCursor()) {
+                    if (this._textModel.isCursor()) {
                         this._context.fillStyle = this._theme.cursorBackgroundColor;
                         var y = (selection.start.line * fontSize.height) + paddingTop;
                         this._context.fillRect(0, y, this._canvas.width, fontSize.height);
-                        if(this._blinkState && this._textController.isFocused()) {
+
+                        if (this._blinkState && this._textController.isFocused()) {
                             this._context.fillStyle = this._theme.cursorColor;
                             this._context.fillRect(paddingLeft + (selection.start.column * fontSize.width), y, 1, fontSize.height);
                         }
                     } else {
                         this._context.fillStyle = focused ? this._theme.selectionColor : this._theme.selectionBlurColor;
                         var y = 0;
-                        for(var line = 0; line < size.line; line++) {
+                        for (var line = 0; line < size.line; line++) {
                             var x = 0;
                             var width = this._canvas.width;
-                            if(line === selection.start.line) {
+                            if (line === selection.start.line) {
                                 x = (selection.start.column < 0) ? 0 : selection.start.column * fontSize.width;
                             }
-                            if(line === selection.end.line) {
+                            if (line === selection.end.line) {
                                 width = (selection.end.column * fontSize.width) - x;
                             }
-                            if((line >= selection.start.line) && (line <= selection.end.line) && (width > 0)) {
+                            if ((line >= selection.start.line) && (line <= selection.end.line) && (width > 0)) {
                                 this._context.fillRect(x + paddingLeft, y + paddingTop, width, fontSize.height);
                             }
                             y += fontSize.height;
                         }
                     }
-                    var stylesTable = {
-                        "text": true
-                    };
-                    var styles = [
-                        "text"
-                    ];
+
+                    var stylesTable = { "text": true };
+                    var styles = ["text"];
                     var font = this._context.font;
                     this._context.shadowOffsetX = 0;
                     this._context.shadowOffsetY = 0;
-                    for(var i = 0; i < styles.length; i++) {
+                    for (var i = 0; i < styles.length; i++) {
                         var currentStyle = styles[i];
                         var theme = this._theme[currentStyle + "Style"];
                         var themeProperties = theme.split(' ');
                         this._context.fillStyle = themeProperties[0];
                         this._context.font = ((themeProperties.length === 2) && (themeProperties[1] === "italic")) ? ("italic " + font) : font;
-                        if((themeProperties.length === 2) && (themeProperties[1] === "bold")) {
+                        if ((themeProperties.length === 2) && (themeProperties[1] === "bold")) {
                             this._context.shadowBlur = (this._textController.isMozilla) ? 0.5 : 1;
                             this._context.shadowColor = themeProperties[0];
                         } else {
                             this._context.shadowBlur = 0;
                             this._context.shadowColor = "rgba(0,0,0,0)";
                         }
+
                         var y = Math.floor(fontSize.height * 0.8) + paddingTop;
-                        for(var line = this._scrollPosition.line; line < (this._scrollPosition.line + size.line); line++) {
-                            if(line < this._textBuffer.getLines()) {
+                        for (var line = this._scrollPosition.line; line < (this._scrollPosition.line + size.line); line++) {
+                            if (line < this._textBuffer.getLines()) {
                                 var text = this._textBuffer.getLine(line);
                                 var syntax = this._languageService.getStyles(line);
                                 var index = 0;
                                 var style = "text";
+
                                 var column = 0;
                                 var position = 0;
-                                while(position < text.length) {
-                                    if(index < syntax.length) {
+                                while (position < text.length) {
+                                    if (index < syntax.length) {
                                         style = syntax[index].style;
-                                        if((i === 0) && !stylesTable.hasOwnProperty(style)) {
+
+                                        if ((i === 0) && !stylesTable.hasOwnProperty(style)) {
                                             stylesTable[style] = true;
                                             styles.push(style);
                                         }
+
                                         index++;
                                     }
                                     var length = (index < syntax.length) ? (syntax[index].start - position) : (text.length - position);
                                     var part = "";
-                                    for(var n = position; n < position + length; n++) {
+                                    for (var n = position; n < position + length; n++) {
                                         part += (text[n] !== '\t') ? text[n] : this._textModel.tabText;
                                     }
-                                    if((currentStyle === style) && ((column - this._scrollPosition.column + part.length) > 0) && ((column - this._scrollPosition.column) < size.column)) {
+                                    if ((currentStyle === style) && ((column - this._scrollPosition.column + part.length) > 0) && ((column - this._scrollPosition.column) < size.column)) {
                                         this._context.fillText(part, (column - this._scrollPosition.column) * fontSize.width + paddingLeft, y);
                                     }
                                     position += length;
@@ -1559,42 +1717,53 @@ var Textor;
                             y += fontSize.height;
                         }
                     }
+
                     this._context.restore();
                 }
+
                 this._invalidRectangles = [];
                 this._textController.updateTextAreaPosition();
             }
         };
+
         TextEditor.prototype.textBuffer_textChanging = function (e) {
             var textRange = this._textModel.toScreenRange(e.oldRange.normalize());
             textRange.end.column = this.size.column + this._scrollPosition.column;
-            if(textRange.start.line != textRange.end.line) {
+            if (textRange.start.line != textRange.end.line) {
                 textRange.end.line = this.size.line + this._scrollPosition.line;
             }
             this.invalidateRange(textRange);
+
             this.onTextChanging(e);
         };
+
         TextEditor.prototype.textBuffer_textChanged = function (e) {
             this._maxColumns = -1;
+
             var textRange = this._textModel.toScreenRange(e.newRange.normalize());
             textRange.end.column = this.size.column + this._scrollPosition.column;
-            if(textRange.start.line != textRange.end.line) {
+            if (textRange.start.line != textRange.end.line) {
                 textRange.end.line = this.size.line + this._scrollPosition.line;
             }
             this.invalidateRange(textRange);
+
             this._languageService.invalidate(e.oldRange, e.newRange, e.text);
+
             this.onTextChanged(e);
         };
+
         TextEditor.prototype.textModel_selectionChanged = function (e) {
             this.invalidateSelection(e.oldRange);
             this.invalidateSelection(e.newRange);
-            if(this._blinkTimerEnabled) {
+
+            if (this._blinkTimerEnabled) {
                 window.clearInterval(this._blinkTimer);
                 this._blinkTimerEnabled = false;
                 this._blinkState = true;
             }
+
             var textRange = e.newRange.clone();
-            if(textRange.isEmpty) {
+            if (textRange.isEmpty) {
                 this._blinkTimerEnabled = true;
                 this._blinkTimer = window.setInterval(function () {
                     this.invalidateSelection(textRange);
@@ -1602,26 +1771,30 @@ var Textor;
                     this._blinkState = !this._blinkState;
                 }.bind(this), 600);
             }
+
             this.onSelectionChanged(e);
         };
+
         TextEditor.prototype.onTextChanged = function (e) {
-            for(var i = 0; i < this._textChangedHandlers.length; i++) {
+            for (var i = 0; i < this._textChangedHandlers.length; i++) {
                 this._textChangedHandlers[i](e);
             }
         };
+
         TextEditor.prototype.onTextChanging = function (e) {
-            for(var i = 0; i < this._textChangingHandlers.length; i++) {
+            for (var i = 0; i < this._textChangingHandlers.length; i++) {
                 this._textChangingHandlers[i](e);
             }
         };
+
         TextEditor.prototype.onSelectionChanged = function (e) {
-            for(var i = 0; i < this._selectionChangedHandlers.length; i++) {
+            for (var i = 0; i < this._selectionChangedHandlers.length; i++) {
                 this._selectionChangedHandlers[i](e);
             }
         };
         return TextEditor;
     })();
-    Textor.TextEditor = TextEditor;    
+    Textor.TextEditor = TextEditor;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -1633,19 +1806,21 @@ var Textor;
             this._undoService = undoService;
         }
         TextModel.prototype.addEventListener = function (type, callback) {
-            switch(type) {
+            switch (type) {
                 case "selectionchanged":
                     this._selectionChangedHandlers.push(callback);
                     break;
             }
         };
+
         TextModel.prototype.removeEventListener = function (type, callback) {
-            switch(type) {
+            switch (type) {
                 case "selectionchanged":
                     this._selectionChangedHandlers.remove(callback);
                     break;
             }
         };
+
         Object.defineProperty(TextModel.prototype, "textRange", {
             get: function () {
                 return this._textRange;
@@ -1653,6 +1828,7 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         Object.defineProperty(TextModel.prototype, "tabText", {
             get: function () {
                 return this._tabText;
@@ -1660,48 +1836,53 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextModel.prototype.select = function (textPosition) {
-            if(!textPosition.equals(this._textRange.start) || !textPosition.equals(this._textRange.end)) {
+            if (!textPosition.equals(this._textRange.start) || !textPosition.equals(this._textRange.end)) {
                 var oldRange = this._textRange;
                 this._textRange = new Textor.TextRange(new Textor.TextPosition(textPosition.line, textPosition.column), new Textor.TextPosition(textPosition.line, textPosition.column));
                 this.onSelectionChanged(new Textor.SelectionChangeEvent(oldRange, this._textRange));
             }
         };
+
         TextModel.prototype.selectRange = function (textRange) {
-            if(!textRange.start.equals(this._textRange.start) || !textRange.end.equals(this._textRange.end)) {
+            if (!textRange.start.equals(this._textRange.start) || !textRange.end.equals(this._textRange.end)) {
                 var oldRange = this._textRange;
                 this._textRange = textRange;
                 this.onSelectionChanged(new Textor.SelectionChangeEvent(oldRange, this._textRange));
             }
         };
+
         TextModel.prototype.moveCursor = function (dimension, distance, direction, select) {
             var position = this._textRange.end;
-            if(!select) {
+            if (!select) {
                 position = (direction === "previous") ? this.getTextRange().start : this.getTextRange().end;
-                if(dimension === "line") {
+                if (dimension === "line") {
                     position.column = (direction === "previous") ? this._textRange.start.column : this._textRange.end.column;
                 }
             }
+
             position = this.toBufferPosition(position);
-            if(dimension === "column") {
-                if(select || this.isCursor()) {
-                    if(distance === "boundary") {
-                        if(direction !== "previous") {
+
+            if (dimension === "column") {
+                if (select || this.isCursor()) {
+                    if (distance === "boundary") {
+                        if (direction !== "previous") {
                             position.column = this._textBuffer.getColumns(position.line);
                         } else {
                             var text = this._textBuffer.getLine(position.line);
-                            for(var i = 0; i < text.length; i++) {
-                                if((text[i] !== ' ') && (text[i] !== '\t')) {
+                            for (var i = 0; i < text.length; i++) {
+                                if ((text[i] !== ' ') && (text[i] !== '\t')) {
                                     position.column = (i === position.column) ? 0 : i;
                                     break;
                                 }
                             }
                         }
-                    } else if(distance === "word") {
+                    } else if (distance === "word") {
                         var text = this._textBuffer.getLine(position.line);
-                        if((direction !== "previous") && (position.column >= text.length)) {
+                        if ((direction !== "previous") && (position.column >= text.length)) {
                             position.column++;
-                        } else if((direction === "previous") && (position.column === 0)) {
+                        } else if ((direction === "previous") && (position.column === 0)) {
                             position.column--;
                         } else {
                             position.column = this.findWordBreak(text, position.column, (direction == "previous") ? -1 : +1);
@@ -1709,69 +1890,77 @@ var Textor;
                     } else {
                         position.column += (direction === "previous") ? -Number(distance) : +Number(distance);
                     }
-                    if(position.column < 0) {
+
+                    if (position.column < 0) {
                         position.line--;
-                        if(position.line < 0) {
+                        if (position.line < 0) {
                             position.line = 0;
                             position.column = 0;
                         } else {
                             position.column = this._textBuffer.getColumns(position.line);
                         }
                     }
-                    if(position.column > this._textBuffer.getColumns(position.line)) {
+
+                    if (position.column > this._textBuffer.getColumns(position.line)) {
                         position.line++;
                         position.column = 0;
-                        if(position.line >= this._textBuffer.getLines()) {
+                        if (position.line >= this._textBuffer.getLines()) {
                             position.line = this._textBuffer.getLines() - 1;
                             position.column = this._textBuffer.getColumns(position.line);
                         }
                     }
                 }
             }
-            if(dimension === "line") {
-                if(distance !== "boundrary") {
+
+            if (dimension === "line") {
+                if (distance !== "boundrary") {
                     position.line += (direction === "previous") ? -Number(distance) : +Number(distance);
                 }
-                if(position.line < 0) {
+                if (position.line < 0) {
                     position.line = 0;
                     position.column = 0;
-                } else if(position.line > this._textBuffer.getLines() - 1) {
+                } else if (position.line > this._textBuffer.getLines() - 1) {
                     position.line = this._textBuffer.getLines() - 1;
                     position.column = this._textBuffer.getColumns(position.line);
                 }
             }
+
             position = this.toScreenPosition(position);
+
             var textRange = (select) ? new Textor.TextRange(new Textor.TextPosition(this._textRange.start.line, this._textRange.start.column), position) : new Textor.TextRange(position, position);
+
             this._undoService.begin();
             this._undoService.add(new Textor.SelectionUndoUnit(this, textRange));
             this._undoService.commit();
         };
+
         TextModel.prototype.insertText = function (text) {
             this._undoService.begin();
             this._undoService.add(new Textor.TextUndoUnit(this, this._textBuffer, this.toBufferRange(this.getTextRange()), text));
             this._undoService.commit();
         };
+
         TextModel.prototype.deleteSelection = function (position) {
-            if(!this.isCursor() || (position === null)) {
+            if (!this.isCursor() || (position === null)) {
                 this.insertText("");
             } else {
                 var textRange = this.toBufferRange(this.getTextRange());
-                if(position === "previous") {
+                if (position === "previous") {
                     textRange.start.column--;
-                    if(textRange.start.column < 0) {
+                    if (textRange.start.column < 0) {
                         textRange.start.line--;
-                        if(textRange.start.line < 0) {
+                        if (textRange.start.line < 0) {
                             textRange.start.line = 0;
                             textRange.start.column = 0;
                         } else {
                             textRange.start.column = this._textBuffer.getColumns(textRange.start.line);
                         }
                     }
-                } else if(position === "next") {
+                } else if (position === "next") {
                     textRange.end.column++;
-                    if(textRange.end.column > this._textBuffer.getColumns(textRange.end.line)) {
+                    if (textRange.end.column > this._textBuffer.getColumns(textRange.end.line)) {
                         textRange.end.line++;
-                        if(textRange.end.line > this._textBuffer.getLines() - 1) {
+                        if (textRange.end.line > this._textBuffer.getLines() - 1) {
                             textRange.end.line = this._textBuffer.getLines() - 1;
                             textRange.end.column = this._textBuffer.getColumns(textRange.end.line);
                         } else {
@@ -1779,43 +1968,49 @@ var Textor;
                         }
                     }
                 }
+
                 this._undoService.begin();
                 this._undoService.add(new Textor.TextUndoUnit(this, this._textBuffer, textRange, ""));
                 this._undoService.commit();
             }
         };
+
         TextModel.prototype.getTextRange = function () {
-            if(this.isCursor()) {
+            if (this.isCursor()) {
                 var line = this._textRange.start.line;
                 var column = this._textRange.start.column;
-                if(line >= this._textBuffer.getLines()) {
+                if (line >= this._textBuffer.getLines()) {
                     line = this._textBuffer.getLines() - 1;
                     column = this.getColumns(line);
-                } else if(column > this.getColumns(line)) {
+                } else if (column > this.getColumns(line)) {
                     column = this.getColumns(line);
                 }
                 return new Textor.TextRange(new Textor.TextPosition(line, column), new Textor.TextPosition(line, column));
             }
+
             var textRange = this._textRange.clone();
-            if(textRange.start.line >= this._textBuffer.getLines()) {
+            if (textRange.start.line >= this._textBuffer.getLines()) {
                 textRange.start.line = this._textBuffer.getLines() - 1;
                 textRange.start.column = this.getColumns(textRange.start.line);
             }
-            if(textRange.end.line >= this._textBuffer.getLines()) {
+            if (textRange.end.line >= this._textBuffer.getLines()) {
                 textRange.end.line = this._textBuffer.getLines() - 1;
                 textRange.end.column = this.getColumns(textRange.end.line);
             }
-            if(textRange.start.column > this.getColumns(textRange.start.line)) {
+            if (textRange.start.column > this.getColumns(textRange.start.line)) {
                 textRange.start = new Textor.TextPosition(textRange.start.line, this.getColumns(textRange.start.line));
             }
-            if(textRange.end.column > this.getColumns(textRange.end.line)) {
+            if (textRange.end.column > this.getColumns(textRange.end.line)) {
                 textRange.end = new Textor.TextPosition(textRange.end.line, this.getColumns(textRange.end.line));
             }
             return textRange.normalize();
         };
+
         TextModel.prototype.isCursor = function () {
             return this._textRange.isEmpty;
         };
+
+
         Object.defineProperty(TextModel.prototype, "tabSize", {
             get: function () {
                 return this._tabSize;
@@ -1823,84 +2018,94 @@ var Textor;
             set: function (value) {
                 this._tabSize = value;
                 this._tabText = "";
-                for(var i = 0; i < this._tabSize; i++) {
+                for (var i = 0; i < this._tabSize; i++) {
                     this._tabText += " ";
                 }
             },
             enumerable: true,
             configurable: true
         });
+
         TextModel.prototype.getColumns = function (line) {
             return this.getTabLength(this._textBuffer.getLine(line));
         };
+
         TextModel.prototype.getTabLength = function (text) {
             var tabLength = 0;
             var bufferLength = text.length;
-            for(var i = 0; i < bufferLength; i++) {
+            for (var i = 0; i < bufferLength; i++) {
                 tabLength += (text[i] === '\t') ? this._tabSize : 1;
             }
             return tabLength;
         };
+
         TextModel.prototype.toScreenPosition = function (textPosition) {
             var text = this._textBuffer.getLine(textPosition.line).substring(0, textPosition.column);
             var length = this.getTabLength(text) - text.length;
             return new Textor.TextPosition(textPosition.line, textPosition.column + length);
         };
+
         TextModel.prototype.toBufferPosition = function (textPosition) {
             var text = this._textBuffer.getLine(textPosition.line);
             var column = 0;
-            for(var i = 0; i < text.length; i++) {
+            for (var i = 0; i < text.length; i++) {
                 column += (text[i] === '\t') ? this._tabSize : 1;
-                if(column > textPosition.column) {
+                if (column > textPosition.column) {
                     return new Textor.TextPosition(textPosition.line, i);
                 }
             }
             return new Textor.TextPosition(textPosition.line, text.length);
         };
+
         TextModel.prototype.toScreenRange = function (textRange) {
             return new Textor.TextRange(this.toScreenPosition(textRange.start), this.toScreenPosition(textRange.end));
         };
+
         TextModel.prototype.toBufferRange = function (textRange) {
             return new Textor.TextRange(this.toBufferPosition(textRange.start), this.toBufferPosition(textRange.end));
         };
+
         TextModel.prototype.getIndent = function () {
             var textRange = this.getTextRange();
-            if(textRange.isEmpty) {
+            if (textRange.isEmpty) {
                 var text = this._textBuffer.getLine(textRange.end.line);
                 var index = 0;
-                while((index < text.length) && (text[index] == "\t" || text[index] == ' ')) {
+                while ((index < text.length) && (text[index] == "\t" || text[index] == ' ')) {
                     index++;
                 }
                 text = text.substring(0, index);
-                if(textRange.end.column >= this.getTabLength(text)) {
+                if (textRange.end.column >= this.getTabLength(text)) {
                     return text;
                 }
             }
             return "";
         };
+
         TextModel.prototype.findWordBreak = function (text, startIndex, increment) {
-            if(increment < 0) {
+            if (increment < 0) {
                 startIndex += increment;
             }
             var startState = this.isWordSeparator(text[startIndex]);
-            for(var i = startIndex; (i >= 0) && (i < text.length); i += increment) {
-                if(this.isWordSeparator(text[i]) != startState) {
+            for (var i = startIndex; (i >= 0) && (i < text.length); i += increment) {
+                if (this.isWordSeparator(text[i]) != startState) {
                     return (increment < 0) ? (i -= increment) : i;
                 }
             }
             return (increment < 0) ? 0 : text.length;
         };
+
         TextModel.prototype.isWordSeparator = function (character) {
             return ' \t\'",;.!~@#$%^&*?=<>()[]:\\+-'.indexOf(character) !== -1;
         };
+
         TextModel.prototype.onSelectionChanged = function (e) {
-            for(var i = 0; i < this._selectionChangedHandlers.length; i++) {
+            for (var i = 0; i < this._selectionChangedHandlers.length; i++) {
                 this._selectionChangedHandlers[i](e);
             }
         };
         return TextModel;
     })();
-    Textor.TextModel = TextModel;    
+    Textor.TextModel = TextModel;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -1912,19 +2117,22 @@ var Textor;
         TextPosition.prototype.equals = function (position) {
             return ((this.line === position.line) && (this.column === position.column));
         };
+
         TextPosition.prototype.compareTo = function (position) {
             var line = this.line - position.line;
             return (line === 0) ? (this.column - position.column) : line;
         };
+
         TextPosition.prototype.clone = function () {
             return new TextPosition(this.line, this.column);
         };
+
         TextPosition.prototype.toString = function () {
             return "(" + this.line + "," + this.column + ")";
         };
         return TextPosition;
     })();
-    Textor.TextPosition = TextPosition;    
+    Textor.TextPosition = TextPosition;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -1940,18 +2148,21 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextRange.prototype.normalize = function () {
             return (this.start.compareTo(this.end) > 0) ? new TextRange(this.end.clone(), this.start.clone()) : this.clone();
         };
+
         TextRange.prototype.clone = function () {
             return new TextRange(this.start.clone(), this.end.clone());
         };
+
         TextRange.prototype.toString = function () {
             return this.start.toString() + "-" + this.end.toString();
         };
         return TextRange;
     })();
-    Textor.TextRange = TextRange;    
+    Textor.TextRange = TextRange;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -1968,19 +2179,21 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextReader.prototype.peek = function () {
-            if(this._textPosition.line < this._textBuffer.getLines()) {
+            if (this._textPosition.line < this._textBuffer.getLines()) {
                 var text = this._textBuffer.getLine(this._textPosition.line);
                 return (this._textPosition.column >= text.length) ? '\n' : text[this._textPosition.column];
             }
             return "";
         };
+
         TextReader.prototype.read = function () {
-            if(this._textPosition.line < this._textBuffer.getLines()) {
+            if (this._textPosition.line < this._textBuffer.getLines()) {
                 var text = this._textBuffer.getLine(this._textPosition.line);
                 var c = (this._textPosition.column >= text.length) ? '\n' : text[this._textPosition.column];
                 this._textPosition.column++;
-                if(this._textPosition.column > text.length) {
+                if (this._textPosition.column > text.length) {
                     this._textPosition.column = 0;
                     this._textPosition.line++;
                 }
@@ -1988,13 +2201,14 @@ var Textor;
             }
             return "";
         };
+
         TextReader.prototype.match = function (text) {
             var line = this._textPosition.line;
             var column = this._textPosition.column;
             var index = 0;
-            while(index < text.length) {
+            while (index < text.length) {
                 var c = this.read();
-                if((c.length === 0) || (c !== text[index])) {
+                if ((c.length === 0) || (c !== text[index])) {
                     this._textPosition.line = line;
                     this._textPosition.column = column;
                     return false;
@@ -2003,27 +2217,29 @@ var Textor;
             }
             return true;
         };
+
         TextReader.prototype.skipWhitespaces = function () {
             var character;
             var skipped = false;
-            while(((character = this.peek()).length > 0) && this.isWhitespace(character)) {
+            while (((character = this.peek()).length > 0) && this.isWhitespace(character)) {
                 this.read();
                 skipped = true;
             }
             return skipped;
         };
+
         TextReader.prototype.skipLineTerminators = function () {
             var character;
             var skipped = false;
-            while(((character = this.peek()).length > 0)) {
-                if(character === '\n') {
+            while (((character = this.peek()).length > 0)) {
+                if (character === '\n') {
                     this.read();
-                    if(this.peek() === '\r') {
+                    if (this.peek() === '\r') {
                         this.read();
                     }
                     skipped = true;
                     continue;
-                } else if(character === '\r' || character === '\u2028' || character === '\u2029') {
+                } else if (character === '\r' || character === '\u2028' || character === '\u2029') {
                     this.read();
                     skipped = true;
                     continue;
@@ -2032,20 +2248,23 @@ var Textor;
             }
             return skipped;
         };
+
         TextReader.prototype.save = function () {
             this._lastLine = this._textPosition.line;
             this._lastColumn = this._textPosition.column;
         };
+
         TextReader.prototype.restore = function () {
             this._textPosition.line = this._lastLine;
             this._textPosition.column = this._lastColumn;
         };
+
         TextReader.prototype.isWhitespace = function (character) {
             return (character === ' ' || character === '\t' || character === '\u00A0');
         };
         return TextReader;
     })();
-    Textor.TextReader = TextReader;    
+    Textor.TextReader = TextReader;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -2064,14 +2283,16 @@ var Textor;
             this._textBuffer.setText(this._undoRange, this._undoText);
             this._textModel.selectRange(this._undoSelection);
         };
+
         TextUndoUnit.prototype.redo = function () {
             this._undoRange = this._textBuffer.setText(this._redoRange, this._redoText);
-            if(this._redoSelection === null) {
+            if (this._redoSelection === null) {
                 var position = this._textModel.toScreenPosition(this._undoRange.end);
                 this._redoSelection = new Textor.TextRange(position.clone(), position.clone());
             }
             this._textModel.selectRange(this._redoSelection);
         };
+
         Object.defineProperty(TextUndoUnit.prototype, "isEmpty", {
             get: function () {
                 return false;
@@ -2079,20 +2300,22 @@ var Textor;
             enumerable: true,
             configurable: true
         });
+
         TextUndoUnit.prototype.merge = function (undoUnit) {
-            if(undoUnit instanceof Textor.SelectionUndoUnit) {
+            if (undoUnit instanceof Textor.SelectionUndoUnit) {
                 var selectionUndoUnit = undoUnit;
                 this._redoSelection = selectionUndoUnit.redoTextRange;
                 return true;
             }
             return false;
         };
+
         TextUndoUnit.prototype.toString = function () {
             return "Text: " + this._undoRange.toString() + " => " + this._redoRange.toString() + " | \'" + this._undoText.replace(/\t/g, "\\t") + "' => '" + this._redoText.replace(/\t/g, "\\t") + "' | " + this._undoSelection.toString() + " => " + this._redoSelection.toString();
         };
         return TextUndoUnit;
     })();
-    Textor.TextUndoUnit = TextUndoUnit;    
+    Textor.TextUndoUnit = TextUndoUnit;
 })(Textor || (Textor = {}));
 var Textor;
 (function (Textor) {
@@ -2105,24 +2328,28 @@ var Textor;
         UndoService.prototype.begin = function () {
             this._container = new Textor.ContainerUndoUnit();
         };
+
         UndoService.prototype.cancel = function () {
             this._container = null;
         };
+
         UndoService.prototype.commit = function () {
-            if(!this._container.isEmpty) {
+            if (!this._container.isEmpty) {
                 this._stack.splice(this._position, this._stack.length - this._position);
                 this._stack.push(this._container);
                 this.redo();
+
                 var c1 = this._stack[this._stack.length - 1];
-                for(var i = c1.undoUnits.length - 1; i > 0; i--) {
-                    if(!c1.undoUnits[i - 1].merge(c1.undoUnits[i])) {
+                for (var i = c1.undoUnits.length - 1; i > 0; i--) {
+                    if (!c1.undoUnits[i - 1].merge(c1.undoUnits[i])) {
                         break;
                     }
                     c1.undoUnits.splice(i, 1);
                 }
-                if(this._stack.length > 1) {
+
+                if (this._stack.length > 1) {
                     var c2 = this._stack[this._stack.length - 2];
-                    if((c1.undoUnits.length === 1) && (c2.undoUnits.length > 0) && (c2.undoUnits[c2.undoUnits.length - 1].merge(c1.undoUnits[0]))) {
+                    if ((c1.undoUnits.length === 1) && (c2.undoUnits.length > 0) && (c2.undoUnits[c2.undoUnits.length - 1].merge(c1.undoUnits[0]))) {
                         this._stack.splice(this._stack.length - 1, 1);
                         this._position--;
                     }
@@ -2130,33 +2357,38 @@ var Textor;
             }
             this._container = null;
         };
+
         UndoService.prototype.add = function (undoUnit) {
             this._container.add(undoUnit);
         };
+
         UndoService.prototype.clear = function () {
             this._stack = [];
             this._position = 0;
         };
+
         UndoService.prototype.undo = function () {
-            if(this._position !== 0) {
+            if (this._position !== 0) {
                 this._position--;
                 this._stack[this._position].undo();
             }
         };
+
         UndoService.prototype.redo = function () {
-            if((this._stack.length !== 0) && (this._position < this._stack.length)) {
+            if ((this._stack.length !== 0) && (this._position < this._stack.length)) {
                 this._stack[this._position].redo();
                 this._position++;
             }
         };
+
         UndoService.prototype.toString = function () {
             var text = "";
-            for(var i = 0; i < this._stack.length; i++) {
+            for (var i = 0; i < this._stack.length; i++) {
                 text += this._stack[i].toString();
             }
             return text;
         };
         return UndoService;
     })();
-    Textor.UndoService = UndoService;    
+    Textor.UndoService = UndoService;
 })(Textor || (Textor = {}));
