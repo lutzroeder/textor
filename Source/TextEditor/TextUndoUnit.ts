@@ -38,12 +38,12 @@ module Textor
 			this._textModel.selectRange(this._redoSelection);
 		}
 
-		public get isEmpty(): bool
+		public get isEmpty(): boolean
 		{
 			return false;
 		}
 
-		public merge(undoUnit: IUndoUnit): bool
+		public merge(undoUnit: IUndoUnit): boolean
 		{
 			if (undoUnit instanceof SelectionUndoUnit)
 			{

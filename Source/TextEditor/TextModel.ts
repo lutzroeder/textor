@@ -61,7 +61,7 @@ module Textor
 			}
 		}
 
-		public moveCursor(dimension: string, distance: string, direction: string, select: bool)
+		public moveCursor(dimension: string, distance: string, direction: string, select: boolean)
 		{
 			var position: TextPosition = this._textRange.end;
 			if (!select)
@@ -276,7 +276,7 @@ module Textor
 			return textRange.normalize();
 		}
 
-		public isCursor(): bool
+		public isCursor(): boolean
 		{
 			return this._textRange.isEmpty;
 		}
@@ -372,7 +372,7 @@ module Textor
 			{
 				startIndex += increment;
 			}
-			var startState: bool = this.isWordSeparator(text[startIndex]);
+			var startState: boolean = this.isWordSeparator(text[startIndex]);
 			for (var i = startIndex; (i >= 0) && (i < text.length); i += increment)
 			{
 				if (this.isWordSeparator(text[i]) != startState)
@@ -383,7 +383,7 @@ module Textor
 			return (increment < 0) ? 0 : text.length;
 		}
 
-		private isWordSeparator(character: string): bool
+		private isWordSeparator(character: string): boolean
 		{
 			return ' \t\'",;.!~@#$%^&*?=<>()[]:\\+-'.indexOf(character) !== -1;
 		}

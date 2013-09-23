@@ -2,9 +2,9 @@ module Textor
 {
 	export interface IUndoUnit
 	{
-		isEmpty: bool;
+		isEmpty: boolean;
 		undo(): void;
 		redo(): void;
-		merge(undoUnit: IUndoUnit): bool;
+		merge(undoUnit: IUndoUnit): boolean;
 	}
 }

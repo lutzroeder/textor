@@ -45,7 +45,7 @@ module Textor
 			return "";
 		}
 
-		public match(text: string): bool
+		public match(text: string): boolean
 		{
 			var line: number = this._textPosition.line;
 			var column: number = this._textPosition.column;
@@ -64,10 +64,10 @@ module Textor
 			return true;
 		}
 
-		public skipWhitespaces(): bool
+		public skipWhitespaces(): boolean
 		{
 			var character: string;
-			var skipped: bool = false;
+			var skipped: boolean = false;
 			while (((character = this.peek()).length > 0) && this.isWhitespace(character))
 			{
 				this.read();
@@ -76,10 +76,10 @@ module Textor
 			return skipped;
 		}
 
-		public skipLineTerminators(): bool
+		public skipLineTerminators(): boolean
 		{
 			var character: string;
-			var skipped: bool = false;
+			var skipped: boolean = false;
 			while (((character = this.peek()).length > 0))
 			{
 				if (character === '\n')
@@ -115,7 +115,7 @@ module Textor
 			this._textPosition.column = this._lastColumn;
 		}
 
-		private isWhitespace(character: string): bool
+		private isWhitespace(character: string): boolean
 		{
 			return (character === ' ' || character === '\t' || character === '\u00A0');
 		}

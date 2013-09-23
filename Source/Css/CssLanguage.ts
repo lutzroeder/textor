@@ -239,7 +239,7 @@ module Textor
 			return 'comment';
 		}
 
-		private matchComment(): bool
+		private matchComment(): boolean
 		{
 			if (this._textReader.match('/*'))
 			{
@@ -254,7 +254,7 @@ module Textor
 			return false;
 		}
 
-		private matchString(): bool
+		private matchString(): boolean
 		{
 			var c: string = this._textReader.peek();
 			if (c === "'" || c === '"')
@@ -278,7 +278,7 @@ module Textor
 			return word;
 		}
 
-		private terminate(terminator: string): bool
+		private terminate(terminator: string): boolean
 		{
 			if (this._textReader.match(terminator))
 			{

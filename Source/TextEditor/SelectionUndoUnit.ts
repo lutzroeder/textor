@@ -23,12 +23,12 @@ module Textor
 			this._textModel.selectRange(this._redoTextRange);
 		}
 
-		public get isEmpty(): bool
+		public get isEmpty(): boolean
 		{
 			return false;
 		}
 
-		public merge(undoUnit): bool
+		public merge(undoUnit): boolean
 		{
 			if (undoUnit instanceof SelectionUndoUnit)
 			{

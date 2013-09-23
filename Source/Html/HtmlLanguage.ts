@@ -202,7 +202,7 @@ module Textor
 				}
 			}
 
-			var closeTag: bool = false;
+			var closeTag: boolean = false;
 			var style: string = '';
 
 			if (this._token.quote === 's' && c === "'")
@@ -345,7 +345,7 @@ module Textor
 			}
 		}
 
-		private terminate(terminator: string): bool
+		private terminate(terminator: string): boolean
 		{
 			if (this._textReader.match(terminator))
 			{
@@ -356,7 +356,7 @@ module Textor
 			return false;
 		}
 
-		private testIgnoreCase(text: string): bool
+		private testIgnoreCase(text: string): boolean
 		{
 			this._textReader.save();
 			for (var i = 0; i < text.length; i++)

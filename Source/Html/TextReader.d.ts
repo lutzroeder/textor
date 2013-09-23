@@ -4,9 +4,9 @@ declare module Textor
 	{
 		peek(): string;
 		read(): string;
-		match(text: string): bool;
-		skipWhitespaces(): bool;
-		skipLineTerminators(): bool;
+		match(text: string): boolean;
+		skipWhitespaces(): boolean;
+		skipLineTerminators(): boolean;
 		save();
 		restore();
 	}

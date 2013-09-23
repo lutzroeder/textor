@@ -8,7 +8,7 @@ module Textor
 		private _column: number;
 		private _index: number;
 		private _timeout: number;
-		private _timeoutEnabled: bool = false;
+		private _timeoutEnabled: boolean = false;
 		private _language: ILanguage = null;
 		private _syntaxTable: LanguageStyle[][] = [];
 		private _style: string;
