@@ -517,7 +517,7 @@ module Textor
 			return null;
 		}
 
-		private  matchLiteral(): bool
+		private  matchLiteral(): boolean
 		{
 			this._textReader.save();
 			var c: string = this._textReader.read();
@@ -558,7 +558,7 @@ module Textor
 			return false;
 		}
 
-		private matchRegExp(): bool
+		private matchRegExp(): boolean
 		{
 			this._textReader.save();
 			if (this._token.regexp && this._textReader.match('/'))
@@ -605,7 +605,7 @@ module Textor
 			return false;
 		}
 
-		private matchBlockExpression(): bool
+		private matchBlockExpression(): boolean
 		{
 			if (this._textReader.match('{'))
 			{
@@ -625,7 +625,7 @@ module Textor
 			return false;
 		}
 
-		private matchComment(): bool
+		private matchComment(): boolean
 		{
 			if (this._textReader.match('//'))
 			{
@@ -652,7 +652,7 @@ module Textor
 			return word;
 		}
 
-		private terminate(terminator: string): bool
+		private terminate(terminator: string): boolean
 		{
 			if (this._textReader.match(terminator))
 			{

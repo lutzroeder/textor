@@ -97,6 +97,7 @@ var Textor;
                     this._timeoutEnabled = false;
                 }
 
+                // search backwards to find position with last known state
                 var state = null;
                 this._line = 0;
                 this._column = 0;
@@ -121,16 +122,19 @@ var Textor;
                     }
                 }
 
+                // move syntax data that has not changed and clear new range if text is inserted
                 this.moveRange(oldRange.end.clone(), newRange.end.clone());
                 if (text.length > 0) {
                     this.clearRange(newRange.start, newRange.end);
                 }
 
+                // find syntax line index for start position
                 this._index = 0;
                 while ((this._syntaxTable[this._line]) && (this._index < this._syntaxTable[this._line].length) && (this._column > this._syntaxTable[this._line][this._index].start)) {
                     this._index++;
                 }
 
+                // create text reader and initialize language module
                 this._textReader = this._textEditor.createTextReader();
                 this._textReader.textPosition.line = this._line;
                 this._textReader.textPosition.column = this._column;
@@ -181,6 +185,7 @@ var Textor;
 
         LanguageService.prototype.moveRange = function (oldPosition, newPosition) {
             if (oldPosition.compareTo(newPosition) < 0) {
+                // update data after old position to new position
                 var index = 0;
                 while ((this._syntaxTable[oldPosition.line]) && (index < this._syntaxTable[oldPosition.line].length) && (oldPosition.column > this._syntaxTable[oldPosition.line][index].start)) {
                     index++;
@@ -202,6 +207,7 @@ var Textor;
                     this._syntaxTable[newPosition.line] = this._syntaxTable[newPosition.line].concat(syntax);
                 }
             } else if (oldPosition.compareTo(newPosition) > 0) {
+                // remove data between old position and new position
                 var index = 0;
                 if (oldPosition.line >= this._syntaxTable.length) {
                     oldPosition.line = this._syntaxTable.length - 1;
@@ -708,6 +714,7 @@ var Textor;
         };
 
         TextController.prototype.textArea_beforeCut = function (e) {
+            // select text in the text area so the cut event will fire.
             this._textEditor.copy();
         };
 
@@ -730,6 +737,7 @@ var Textor;
                 this._canvas.className = this._canvas.className.replace(new RegExp(" focus\\b"), "");
             }
             this._textEditor.invalidate();
+            // TODO calling update() will cause IE9 Beta1 to flicker
         };
 
         TextController.prototype.canvas_focus = function (e) {
@@ -755,6 +763,7 @@ var Textor;
                 this._mouseCapture = true;
                 this.startScrollTimer();
             } else if (clicks === 2) {
+                // select word at position
                 this._textEditor.selectWord(position.line, position.column);
                 this._mouseCapture = true;
                 this.startScrollTimer();
@@ -973,6 +982,7 @@ var Textor;
         };
 
         TextController.prototype.updateTextAreaPosition = function () {
+            // hide the textarea under the canvas control
             var point = new Textor.Point(0, 0);
             var node = this._canvas;
             while (node !== null) {
@@ -1491,11 +1501,13 @@ var Textor;
             }
 
             if (selection.column < 5) {
+                // scroll left with a 5 character margin
                 horizontal = selection.column - 5;
                 if (this._scrollPosition.column + horizontal < 0) {
                     horizontal = -this._scrollPosition.column;
                 }
             } else if (selection.column > (size.column - 5)) {
+                // scroll right with a 5 character margin
                 horizontal = selection.column - size.column + 5;
 
                 var maxColumns = this.getMaxColumns();
@@ -1559,6 +1571,7 @@ var Textor;
         TextEditor.prototype.invalidateSelection = function (textRange) {
             this.invalidateRange(textRange);
 
+            // invalidate current line including padding area
             var paddingLeft = parseFloat(this._theme.paddingLeft);
             var paddingTop = parseFloat(this._theme.paddingTop);
             var fontSize = this.fontSize;
@@ -1608,6 +1621,7 @@ var Textor;
 
         TextEditor.prototype.update = function () {
             if (this._invalidRectangles.length !== 0) {
+                // merge invalid rectangles to a single clip rectangle
                 var clipRectangle = this._invalidRectangles[0];
                 for (var i = 1; i < this._invalidRectangles.length; i++) {
                     clipRectangle = clipRectangle.union(this._invalidRectangles[i]);
@@ -1615,12 +1629,17 @@ var Textor;
                 if ((clipRectangle.width !== 0) && (clipRectangle.height !== 0)) {
                     this._context.save();
 
+                    // erase all content
+                    // this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
+                    // console.log("(" + clipRectangle.x + "," + clipRectangle.y + ")-(" + clipRectangle.width + "," + clipRectangle.height + ")");
+                    // apply clip rectangle
                     this._context.beginPath();
                     this._context.rect(clipRectangle.x, clipRectangle.y, clipRectangle.width, clipRectangle.height);
                     this._context.clip();
 
                     var focused = this._textController.isFocused();
 
+                    // erase background
                     this._context.fillStyle = focused ? this._theme.backgroundColor : this._theme.backgroundBlurColor;
                     this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
@@ -1635,15 +1654,18 @@ var Textor;
                     selection.start.column -= this._scrollPosition.column;
                     selection.end.column -= this._scrollPosition.column;
                     if (this._textModel.isCursor()) {
+                        // draw selected line
                         this._context.fillStyle = this._theme.cursorBackgroundColor;
                         var y = (selection.start.line * fontSize.height) + paddingTop;
                         this._context.fillRect(0, y, this._canvas.width, fontSize.height);
 
                         if (this._blinkState && this._textController.isFocused()) {
+                            // draw insertion point
                             this._context.fillStyle = this._theme.cursorColor;
                             this._context.fillRect(paddingLeft + (selection.start.column * fontSize.width), y, 1, fontSize.height);
                         }
                     } else {
+                        // draw selection
                         this._context.fillStyle = focused ? this._theme.selectionColor : this._theme.selectionBlurColor;
                         var y = 0;
                         for (var line = 0; line < size.line; line++) {
@@ -1662,18 +1684,21 @@ var Textor;
                         }
                     }
 
+                    // draw text
                     var stylesTable = { "text": true };
                     var styles = ["text"];
                     var font = this._context.font;
                     this._context.shadowOffsetX = 0;
                     this._context.shadowOffsetY = 0;
                     for (var i = 0; i < styles.length; i++) {
+                        // apply style
                         var currentStyle = styles[i];
                         var theme = this._theme[currentStyle + "Style"];
                         var themeProperties = theme.split(' ');
                         this._context.fillStyle = themeProperties[0];
                         this._context.font = ((themeProperties.length === 2) && (themeProperties[1] === "italic")) ? ("italic " + font) : font;
                         if ((themeProperties.length === 2) && (themeProperties[1] === "bold")) {
+                            // fake bold by adding a shadow
                             this._context.shadowBlur = (this._textController.isMozilla) ? 0.5 : 1;
                             this._context.shadowColor = themeProperties[0];
                         } else {
@@ -1689,6 +1714,7 @@ var Textor;
                                 var index = 0;
                                 var style = "text";
 
+                                // var state = null;
                                 var column = 0;
                                 var position = 0;
                                 while (position < text.length) {
@@ -1700,6 +1726,14 @@ var Textor;
                                             styles.push(style);
                                         }
 
+                                        // debug code to show colorizer restart locations
+                                        // if (syntax[index].state !== null)
+                                        // {
+                                        //	this._context.save();
+                                        //	this._context.fillStyle = "#ff0000";
+                                        //	this._context.fillRect((column - this._scrollPosition.column) * fontSize.width + padding.left + 2.5, y - Math.floor(fontSize.height * 0.8) + 0.5, 0.5, fontSize.height - 2);
+                                        //	this._context.restore();
+                                        // }
                                         index++;
                                     }
                                     var length = (index < syntax.length) ? (syntax[index].start - position) : (text.length - position);
@@ -1719,6 +1753,10 @@ var Textor;
                     }
 
                     this._context.restore();
+                    // draw clip rectangle
+                    // this._context.strokeStyle = "#f00";
+                    // this._context.lineWidth = 2;
+                    // this._context.strokeRect(clipRectangle.x, clipRectangle.y, clipRectangle.width, clipRectangle.height);
                 }
 
                 this._invalidRectangles = [];
@@ -1727,6 +1765,7 @@ var Textor;
         };
 
         TextEditor.prototype.textBuffer_textChanging = function (e) {
+            // invalidate old range
             var textRange = this._textModel.toScreenRange(e.oldRange.normalize());
             textRange.end.column = this.size.column + this._scrollPosition.column;
             if (textRange.start.line != textRange.end.line) {
@@ -1734,12 +1773,15 @@ var Textor;
             }
             this.invalidateRange(textRange);
 
+            // propagate the event to client code
             this.onTextChanging(e);
         };
 
         TextEditor.prototype.textBuffer_textChanged = function (e) {
+            // max width of text might have changed
             this._maxColumns = -1;
 
+            // invalidate new range
             var textRange = this._textModel.toScreenRange(e.newRange.normalize());
             textRange.end.column = this.size.column + this._scrollPosition.column;
             if (textRange.start.line != textRange.end.line) {
@@ -1749,6 +1791,7 @@ var Textor;
 
             this._languageService.invalidate(e.oldRange, e.newRange, e.text);
 
+            // propagate the event to client code
             this.onTextChanged(e);
         };
 
@@ -1764,6 +1807,7 @@ var Textor;
 
             var textRange = e.newRange.clone();
             if (textRange.isEmpty) {
+                // timer for blinking cursor
                 this._blinkTimerEnabled = true;
                 this._blinkTimer = window.setInterval(function () {
                     this.invalidateSelection(textRange);
@@ -1772,6 +1816,7 @@ var Textor;
                 }.bind(this), 600);
             }
 
+            // propagate the event to client code
             this.onSelectionChanged(e);
         };
 
@@ -1862,6 +1907,7 @@ var Textor;
                 }
             }
 
+            // switch to text buffer units
             position = this.toBufferPosition(position);
 
             if (dimension === "column") {
@@ -1870,6 +1916,7 @@ var Textor;
                         if (direction !== "previous") {
                             position.column = this._textBuffer.getColumns(position.line);
                         } else {
+                            // search first non-whitespace character
                             var text = this._textBuffer.getLine(position.line);
                             for (var i = 0; i < text.length; i++) {
                                 if ((text[i] !== ' ') && (text[i] !== '\t')) {
@@ -1925,6 +1972,7 @@ var Textor;
                 }
             }
 
+            // switch back to selection units with tabs expanded
             position = this.toScreenPosition(position);
 
             var textRange = (select) ? new Textor.TextRange(new Textor.TextPosition(this._textRange.start.line, this._textRange.start.column), position) : new Textor.TextRange(position, position);
@@ -2040,12 +2088,14 @@ var Textor;
         };
 
         TextModel.prototype.toScreenPosition = function (textPosition) {
+            // transform from text buffer position to selection position.
             var text = this._textBuffer.getLine(textPosition.line).substring(0, textPosition.column);
             var length = this.getTabLength(text) - text.length;
             return new Textor.TextPosition(textPosition.line, textPosition.column + length);
         };
 
         TextModel.prototype.toBufferPosition = function (textPosition) {
+            // transform from selection position to text buffer position.
             var text = this._textBuffer.getLine(textPosition.line);
             var column = 0;
             for (var i = 0; i < text.length; i++) {
@@ -2339,6 +2389,7 @@ var Textor;
                 this._stack.push(this._container);
                 this.redo();
 
+                // try to merge all undo units in last container
                 var c1 = this._stack[this._stack.length - 1];
                 for (var i = c1.undoUnits.length - 1; i > 0; i--) {
                     if (!c1.undoUnits[i - 1].merge(c1.undoUnits[i])) {
@@ -2348,6 +2399,7 @@ var Textor;
                 }
 
                 if (this._stack.length > 1) {
+                    // try to merge last container with only one undo unit with last undo unit in previous container
                     var c2 = this._stack[this._stack.length - 2];
                     if ((c1.undoUnits.length === 1) && (c2.undoUnits.length > 0) && (c2.undoUnits[c2.undoUnits.length - 1].merge(c1.undoUnits[0]))) {
                         this._stack.splice(this._stack.length - 1, 1);

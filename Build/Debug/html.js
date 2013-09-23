@@ -3,12 +3,14 @@ var Textor;
     var HtmlLanguage = (function () {
         function HtmlLanguage(languages) {
             this._tokenStack = [];
+            // mixed content languages by mime-type
             this._languages = languages;
         }
         HtmlLanguage.prototype.begin = function (textReader, state) {
             this._textReader = textReader;
             this._tokenStack = [{ type: this.readText }];
 
+            // used for mixed content in JavaScript or CSS
             this._languageToken = null;
 
             if (state !== null) {
@@ -41,26 +43,33 @@ var Textor;
                 }
                 if (this._textReader.match('!')) {
                     if (this._textReader.match('--')) {
+                        // comment
                         this.push({ type: this.readComment });
                         return 'comment';
                     } else if (this._textReader.match('[CDATA[')) {
+                        // constant data
                         this.push({ type: this.readConstantData });
                         return 'literal';
                     } else {
+                        // doc type
                         this.push({ type: this.readDocType });
                         return 'punctuation';
                     }
                 } else if (this._textReader.match('?')) {
+                    // processing instruction
                     this.push({ type: this.readProcessingInstruction });
                     return 'punctuation';
                 } else if (this._textReader.match('/')) {
+                    // close tag
                     this.push({ type: this.readEndTag });
                     return 'punctuation';
                 } else {
+                    // open tag
                     this.push({ type: this.readStartTag, name: '', hasAttributes: false });
                     return 'punctuation';
                 }
             } else if (this._textReader.match('&')) {
+                // entity
                 this.push({ type: this.readEntity });
                 return 'literal';
             }
@@ -164,6 +173,7 @@ var Textor;
                 return 'literal';
             }
 
+            // check if element has mixed content
             var attributeName = this._tokenStack[this._tokenStack.length - 1].name.toUpperCase();
             var elementName = this._tokenStack[this._tokenStack.length - 2].name.toUpperCase();
             if ((attributeName === 'TYPE' && elementName === 'SCRIPT') || (attributeName === 'TYPE' && elementName === 'STYLE')) {
@@ -175,11 +185,14 @@ var Textor;
                 }
             }
 
+            // pop attribute
             this.pop();
             if (closeTag) {
+                // pop start tag
                 this.pop();
                 this.setLanguage();
             } else {
+                // next attribute
                 this.push({ type: this.readAttribute, name: '', value: false });
             }
 

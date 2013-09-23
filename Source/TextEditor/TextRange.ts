@@ -11,7 +11,7 @@ module Textor
 			this.end = end;
 		}
 
-		public get isEmpty(): bool
+		public get isEmpty(): boolean
 		{
 			return ((this.start.line === this.end.line) && (this.start.column === this.end.column));
 		}

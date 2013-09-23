@@ -5,7 +5,7 @@ declare module Textor
 		line: number;
 	 	column: number;
 
-		equals(position: TextPosition): bool;
+		equals(position: TextPosition): boolean;
 		compareTo(position: TextPosition): number;
 		clone();
 		toString(): string;

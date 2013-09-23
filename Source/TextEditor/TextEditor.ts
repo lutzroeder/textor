@@ -17,8 +17,8 @@ module Textor
 		private _invalidRectangles: Rectangle[] = [];
 		private _maxColumns: number = -1;
 		private _blinkTimer: number;
-		private _blinkTimerEnabled: bool = false;
-		private _blinkState: bool = true;
+		private _blinkTimerEnabled: boolean = false;
+		private _blinkState: boolean = true;
 		private _fontSize: Size;
 		private _textBuffer_textChanging: (e: TextChangeEvent) => void;
 		private _textBuffer_textChanged: (e: TextChangeEvent) => void;
@@ -341,7 +341,7 @@ module Textor
 			return new TextReader(this._textBuffer);
 		}
 
-		public processKey(keyCode: number, shiftKey: bool, ctrlKey: bool, altKey: bool, metaKey: bool)
+		public processKey(keyCode: number, shiftKey: boolean, ctrlKey: boolean, altKey: boolean, metaKey: boolean)
 		{
 			if ((ctrlKey || metaKey) && !altKey) // CONTROL or OPTION
 			{
@@ -703,7 +703,7 @@ module Textor
 					this._context.rect(clipRectangle.x, clipRectangle.y, clipRectangle.width, clipRectangle.height);
 					this._context.clip();
 
-					var focused: bool = this._textController.isFocused();
+					var focused: boolean = this._textController.isFocused();
 					
 					// erase background
 					this._context.fillStyle = focused ? this._theme.backgroundColor : this._theme.backgroundBlurColor;

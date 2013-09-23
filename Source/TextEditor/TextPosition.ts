@@ -11,7 +11,7 @@ module Textor
 			this.column = column;
 		}
 
-		public equals(position: TextPosition): bool
+		public equals(position: TextPosition): boolean
 		{
 			return ((this.line === position.line) && (this.column === position.column));
 		}

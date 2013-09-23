@@ -4,13 +4,13 @@ module Textor
 	{
 		private _textEditor: TextEditor;
 		private _canvas: HTMLCanvasElement;
-		private _isWebKit: bool;
-		private _isChrome: bool;
-		private _isMozilla: bool;
-		private _isMac: bool;
+		private _isWebKit: boolean;
+		private _isChrome: boolean;
+		private _isMozilla: boolean;
+		private _isMac: boolean;
 		private _textArea: HTMLTextAreaElement;
 		private _scrollTimer: number;
-		private _mouseCapture: bool;
+		private _mouseCapture: boolean;
 		private _pointerPosition: Point;
 		private _keyCodeTable: any;
 		private _canvas_mouseDownHandler: (e: MouseEvent) => void;
@@ -141,7 +141,7 @@ module Textor
 			}
 		}
 
-		public get isMozilla(): bool
+		public get isMozilla(): boolean
 		{
 			return this._isMozilla;
 		}
@@ -492,7 +492,7 @@ module Textor
 			return textPosition;	
 		}
 
-		private processKey(keyCode: number, shiftKey: bool, ctrlKey: bool, altKey: bool, metaKey: bool)
+		private processKey(keyCode: number, shiftKey: boolean, ctrlKey: boolean, altKey: boolean, metaKey: boolean)
 		{
 			if (this._isMac)
 			{

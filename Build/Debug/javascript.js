@@ -21,6 +21,7 @@ var Textor;
             this._token = this._tokenStack[this._tokenStack.length - 1];
             var style = this._token.type.apply(this);
             if (this._textReader.peek().length === 0) {
+                // end of file
                 this.popToken(this.readExpression);
                 this.popToken(this.readVariable);
                 this.popToken(this.readStatement);
@@ -369,19 +370,23 @@ var Textor;
             var c = this._textReader.read();
             var value = c;
             if (c === "'" || c === '"') {
+                // string literal
                 this.push({ type: this.readString, value: value });
                 return true;
             }
             var comma = true;
             if (c === '-') {
+                // negative number
                 c = this._textReader.read();
                 value += c;
             }
             if ((c === '0') && (this._textReader.peek().toUpperCase() === 'X')) {
+                // hex number
                 value += this._textReader.read();
                 this.push({ type: this.readHexNumber, value: value, comma: false });
                 return true;
             } else if (c === '.') {
+                // floating point
                 c = this._textReader.read();
                 value += c;
                 comma = false;
