@@ -92,6 +92,7 @@ var Textor;
 
         LanguageService.prototype.invalidate = function (oldRange, newRange, text) {
             if (this._language !== null) {
+                // stop existing worker
                 if (this._timeoutEnabled) {
                     window.clearTimeout(this._timeout);
                     this._timeoutEnabled = false;
@@ -849,56 +850,9 @@ var Textor;
                 if (!(this._keyCodeTable)) {
                     this._keyCodeTable = [];
                     var charCodeTable = {
-                        32: ' ',
-                        48: '0',
-                        49: '1',
-                        50: '2',
-                        51: '3',
-                        52: '4',
-                        53: '5',
-                        54: '6',
-                        55: '7',
-                        56: '8',
-                        57: '9',
-                        59: ';',
-                        61: '=',
-                        65: 'a',
-                        66: 'b',
-                        67: 'c',
-                        68: 'd',
-                        69: 'e',
-                        70: 'f',
-                        71: 'g',
-                        72: 'h',
-                        73: 'i',
-                        74: 'j',
-                        75: 'k',
-                        76: 'l',
-                        77: 'm',
-                        78: 'n',
-                        79: 'o',
-                        80: 'p',
-                        81: 'q',
-                        82: 'r',
-                        83: 's',
-                        84: 't',
-                        85: 'u',
-                        86: 'v',
-                        87: 'w',
-                        88: 'x',
-                        89: 'y',
-                        90: 'z',
-                        107: '+',
-                        109: '-',
-                        110: '.',
-                        188: ',',
-                        190: '.',
-                        191: '/',
-                        192: '`',
-                        219: '[',
-                        220: '\\',
-                        221: ']',
-                        222: '\"'
+                        32: ' ', 48: '0', 49: '1', 50: '2', 51: '3', 52: '4', 53: '5', 54: '6', 55: '7', 56: '8', 57: '9', 59: ';', 61: '=',
+                        65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l', 77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r', 83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x', 89: 'y', 90: 'z',
+                        107: '+', 109: '-', 110: '.', 188: ',', 190: '.', 191: '/', 192: '`', 219: '[', 220: '\\', 221: ']', 222: '\"'
                     };
 
                     for (keyCode in charCodeTable) {
@@ -1022,17 +976,17 @@ var Textor;
                 if (ctrlKey && !shiftKey && !altKey && !metaKey) {
                     if (keyCode === 65) {
                         ctrlKey = false;
-                        keyCode = 36;
+                        keyCode = 36; // HOME
                     } else if (keyCode === 69) {
                         ctrlKey = false;
-                        keyCode = 35;
+                        keyCode = 35; // END
                     }
                 } else if (metaKey && keyCode === 37) {
                     metaKey = false;
-                    keyCode = 36;
+                    keyCode = 36; // HOME
                 } else if (metaKey && keyCode === 39) {
                     metaKey = false;
-                    keyCode = 35;
+                    keyCode = 35; // END
                 }
             }
 
@@ -1100,8 +1054,7 @@ var Textor;
                 "elementStyle": "#0000AA bold",
                 "attributeStyle": "#0000AA italic",
                 "errorStyle": "#FF0000 bold",
-                "declarationStyle": "#000000 bold"
-            };
+                "declarationStyle": "#000000 bold" };
 
             this.updateFont();
             this.invalidate();
@@ -1344,7 +1297,7 @@ var Textor;
                 var text = this._textBuffer.getText(textRange);
 
                 if (window.clipboardData && window.clipboardData.getData) {
-                    window.clipboardData.setData("Text", text);
+                    window.clipboardData.setData("Text", text); // IE
                 } else {
                     this._textController.copy(text);
                 }
@@ -1553,6 +1506,7 @@ var Textor;
         };
 
         TextEditor.prototype.getMaxColumns = function () {
+            // find the longest line in the buffer.
             if (this._maxColumns === -1) {
                 for (var line = 0; line < this._textBuffer.getLines(); line++) {
                     var length = this._textModel.getColumns(line);
@@ -1721,6 +1675,7 @@ var Textor;
                                     if (index < syntax.length) {
                                         style = syntax[index].style;
 
+                                        // when rendering the first style collect all other styles in use.
                                         if ((i === 0) && !stylesTable.hasOwnProperty(style)) {
                                             stylesTable[style] = true;
                                             styles.push(style);
@@ -2024,6 +1979,7 @@ var Textor;
         };
 
         TextModel.prototype.getTextRange = function () {
+            // return valid range with tabs expanded
             if (this.isCursor()) {
                 var line = this._textRange.start.line;
                 var column = this._textRange.start.column;

@@ -134,16 +134,16 @@ var Textor;
             if (this._token.quote === '') {
                 if (c === "'") {
                     this._textReader.read();
-                    this._token.quote = 's';
+                    this._token.quote = 's'; // single-quote
                     return 'literal';
                 } else if (c === '"') {
                     this._textReader.read();
-                    this._token.quote = 'd';
+                    this._token.quote = 'd'; // double-quote
                     return 'literal';
                 } else if (this._textReader.skipWhitespaces()) {
                     return 'text';
                 } else {
-                    this._token.quote = '-';
+                    this._token.quote = '-'; // none
                 }
             }
 
@@ -234,6 +234,7 @@ var Textor;
                     this._token.contentData--;
                 }
 
+                // check for </style> or </script> end tag.
                 if ((this._token.contentData == 0) && this.testIgnoreCase(this._token.closeTag)) {
                     this.pop();
                     return this.read();

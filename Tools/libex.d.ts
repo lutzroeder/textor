@@ -40,7 +40,7 @@ interface MouseWheelEvent
     wheelDeltaY: number;
 }
 
-interface CSS2Properties
+interface MSStyleCSSProperties
 {
     resize: string;
 }
