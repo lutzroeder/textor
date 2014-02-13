@@ -374,8 +374,10 @@ module Textor
 				}
 			}
 
-			if (!e.ctrlKey && !e.altKey && !e.metaKey && e.charCode !== 0)
+			// When ctrlKey and altKey both equals true, it means AltGr is pushed. So a valid combination is either false, false or true, true.
+			if (e.ctrlKey == e.altKey && !e.metaKey && e.charCode !== 0)
 			{
+
 				this.stopEvent(e);
 				var text: string = String.fromCharCode(e.charCode);
 				this._textEditor.insertText(text);
