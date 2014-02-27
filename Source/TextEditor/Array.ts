@@ -1,5 +1,5 @@
 
-interface Array
+interface Array<T>
 {
     remove(obj: any);
 }
