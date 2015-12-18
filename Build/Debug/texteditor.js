@@ -533,60 +533,24 @@ var Textor;
             this._textArea.value = ".";
             document.body.appendChild(this._textArea);
             this.updateTextAreaPosition();
-            this._canvas_mouseDownHandler = function (e) {
-                _this.canvas_mouseDown(e);
-            };
-            this._canvas_mouseWheelHandler = function (e) {
-                _this.canvas_mouseWheel(e);
-            };
-            this._canvas_touchStartHandler = function (e) {
-                _this.canvas_touchStart(e);
-            };
-            this._canvas_focusHandler = function (e) {
-                _this.canvas_focus(e);
-            };
-            this._window_mouseUpHandler = function (e) {
-                _this.window_mouseUp(e);
-            };
-            this._window_mouseMoveHandler = function (e) {
-                _this.window_mouseMove(e);
-            };
-            this._canvas_touchEndHandler = function (e) {
-                _this.canvas_touchEnd(e);
-            };
-            this._canvas_touchMoveHandler = function (e) {
-                _this.canvas_touchMove(e);
-            };
-            this._textArea_keyUpHandler = function (e) {
-                _this.textArea_keyUp(e);
-            };
-            this._textArea_keyDownHandler = function (e) {
-                _this.textArea_keyDown(e);
-            };
-            this._textArea_keyPressHandler = function (e) {
-                _this.textArea_keyPress(e);
-            };
-            this._textArea_focusHandler = function (e) {
-                _this.textArea_focus(e);
-            };
-            this._textArea_blurHandler = function (e) {
-                _this.textArea_blur(e);
-            };
-            this._textArea_cutHandler = function (e) {
-                _this.textArea_cut(e);
-            };
-            this._textArea_copyHandler = function (e) {
-                _this.textArea_copy(e);
-            };
-            this._textArea_pasteHandler = function (e) {
-                _this.textArea_paste(e);
-            };
-            this._textArea_beforeCutHandler = function (e) {
-                _this.textArea_beforeCut(e);
-            };
-            this._textArea_beforeCopyHandler = function (e) {
-                _this.textArea_beforeCopy(e);
-            };
+            this._canvas_mouseDownHandler = function (e) { _this.canvas_mouseDown(e); };
+            this._canvas_mouseWheelHandler = function (e) { _this.canvas_mouseWheel(e); };
+            this._canvas_touchStartHandler = function (e) { _this.canvas_touchStart(e); };
+            this._canvas_focusHandler = function (e) { _this.canvas_focus(e); };
+            this._window_mouseUpHandler = function (e) { _this.window_mouseUp(e); };
+            this._window_mouseMoveHandler = function (e) { _this.window_mouseMove(e); };
+            this._canvas_touchEndHandler = function (e) { _this.canvas_touchEnd(e); };
+            this._canvas_touchMoveHandler = function (e) { _this.canvas_touchMove(e); };
+            this._textArea_keyUpHandler = function (e) { _this.textArea_keyUp(e); };
+            this._textArea_keyDownHandler = function (e) { _this.textArea_keyDown(e); };
+            this._textArea_keyPressHandler = function (e) { _this.textArea_keyPress(e); };
+            this._textArea_focusHandler = function (e) { _this.textArea_focus(e); };
+            this._textArea_blurHandler = function (e) { _this.textArea_blur(e); };
+            this._textArea_cutHandler = function (e) { _this.textArea_cut(e); };
+            this._textArea_copyHandler = function (e) { _this.textArea_copy(e); };
+            this._textArea_pasteHandler = function (e) { _this.textArea_paste(e); };
+            this._textArea_beforeCutHandler = function (e) { _this.textArea_beforeCut(e); };
+            this._textArea_beforeCopyHandler = function (e) { _this.textArea_beforeCopy(e); };
             this._canvas.addEventListener("focus", this._canvas_focusHandler, false);
             this._canvas.addEventListener(("onmousewheel" in this._canvas) ? "mousewheel" : "DOMMouseScroll", this._canvas_mouseWheelHandler, false);
             this._canvas.addEventListener("touchstart", this._canvas_touchStartHandler, false);
@@ -782,56 +746,9 @@ var Textor;
                 if (!(this._keyCodeTable)) {
                     this._keyCodeTable = [];
                     var charCodeTable = {
-                        32: ' ',
-                        48: '0',
-                        49: '1',
-                        50: '2',
-                        51: '3',
-                        52: '4',
-                        53: '5',
-                        54: '6',
-                        55: '7',
-                        56: '8',
-                        57: '9',
-                        59: ';',
-                        61: '=',
-                        65: 'a',
-                        66: 'b',
-                        67: 'c',
-                        68: 'd',
-                        69: 'e',
-                        70: 'f',
-                        71: 'g',
-                        72: 'h',
-                        73: 'i',
-                        74: 'j',
-                        75: 'k',
-                        76: 'l',
-                        77: 'm',
-                        78: 'n',
-                        79: 'o',
-                        80: 'p',
-                        81: 'q',
-                        82: 'r',
-                        83: 's',
-                        84: 't',
-                        85: 'u',
-                        86: 'v',
-                        87: 'w',
-                        88: 'x',
-                        89: 'y',
-                        90: 'z',
-                        107: '+',
-                        109: '-',
-                        110: '.',
-                        188: ',',
-                        190: '.',
-                        191: '/',
-                        192: '`',
-                        219: '[',
-                        220: '\\',
-                        221: ']',
-                        222: '\"'
+                        32: ' ', 48: '0', 49: '1', 50: '2', 51: '3', 52: '4', 53: '5', 54: '6', 55: '7', 56: '8', 57: '9', 59: ';', 61: '=',
+                        65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l', 77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r', 83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x', 89: 'y', 90: 'z',
+                        107: '+', 109: '-', 110: '.', 188: ',', 190: '.', 191: '/', 192: '`', 219: '[', 220: '\\', 221: ']', 222: '\"'
                     };
                     for (keyCode in charCodeTable) {
                         var key = charCodeTable[keyCode];
@@ -977,15 +894,9 @@ var Textor;
             this._blinkState = true;
             this._canvas = canvas;
             this._context = canvas.getContext("2d");
-            this._textBuffer_textChanging = function (e) {
-                _this.textBuffer_textChanging(e);
-            };
-            this._textBuffer_textChanged = function (e) {
-                _this.textBuffer_textChanged(e);
-            };
-            this._textModel_selectionChanged = function (e) {
-                _this.textModel_selectionChanged(e);
-            };
+            this._textBuffer_textChanging = function (e) { _this.textBuffer_textChanging(e); };
+            this._textBuffer_textChanged = function (e) { _this.textBuffer_textChanged(e); };
+            this._textModel_selectionChanged = function (e) { _this.textModel_selectionChanged(e); };
             this._textBuffer = new Textor.TextBuffer();
             this._textBuffer.addEventListener("textchanging", this._textBuffer_textChanging);
             this._textBuffer.addEventListener("textchanged", this._textBuffer_textChanged);
@@ -1013,8 +924,7 @@ var Textor;
                 "elementStyle": "#0000AA bold",
                 "attributeStyle": "#0000AA italic",
                 "errorStyle": "#FF0000 bold",
-                "declarationStyle": "#000000 bold"
-            };
+                "declarationStyle": "#000000 bold" };
             this.updateFont();
             this.invalidate();
             this.update();
@@ -1447,6 +1357,7 @@ var Textor;
         TextEditor.prototype.getMaxColumns = function () {
             // find the longest line in the buffer.
             if (this._maxColumns === -1) {
+                // TODO can this be optimized to update incrementatlly?
                 for (var line = 0; line < this._textBuffer.getLines(); line++) {
                     var length = this._textModel.getColumns(line);
                     if (this._maxColumns < length) {
@@ -1827,7 +1738,9 @@ var Textor;
             }
             // switch back to selection units with tabs expanded
             position = this.toScreenPosition(position);
-            var textRange = (select) ? new Textor.TextRange(new Textor.TextPosition(this._textRange.start.line, this._textRange.start.column), position) : new Textor.TextRange(position, position);
+            var textRange = (select) ?
+                new Textor.TextRange(new Textor.TextPosition(this._textRange.start.line, this._textRange.start.column), position) :
+                new Textor.TextRange(position, position);
             this._undoService.begin();
             this._undoService.add(new Textor.SelectionUndoUnit(this, textRange));
             this._undoService.commit();
@@ -2183,7 +2096,10 @@ var Textor;
             return false;
         };
         TextUndoUnit.prototype.toString = function () {
-            return "Text: " + this._undoRange.toString() + " => " + this._redoRange.toString() + " | \'" + this._undoText.replace(/\t/g, "\\t") + "' => '" + this._redoText.replace(/\t/g, "\\t") + "' | " + this._undoSelection.toString() + " => " + this._redoSelection.toString();
+            return "Text: " +
+                this._undoRange.toString() + " => " + this._redoRange.toString() + " | \'" +
+                this._undoText.replace(/\t/g, "\\t") + "' => '" + this._redoText.replace(/\t/g, "\\t") + "' | " +
+                this._undoSelection.toString() + " => " + this._redoSelection.toString();
         };
         return TextUndoUnit;
     })();
