@@ -18,22 +18,22 @@ copy ..\Samples\demo_css.html ..\Build\Release\
 echo Building 'Debug\texteditor.js'.
 set Source=
 for %%i in ("..\Source\TextEditor\*.ts") do call set Source=%%Source%% %%i
-node tsc.js -target ES5 -out ..\Build\Debug\texteditor.js lib.d.ts libex.d.ts %Source%
+node tsc.js -target ES5 -out ..\Build\Debug\texteditor.js ..\Library\lib.d.ts libex.d.ts %Source%
 
 if not exist "..\Build\Debug\texteditor.js" goto :Done
 
 echo Building 'Debug\javascript.js\'.
 set Source=
 for %%i in ("..\Source\JavaScript\*.ts") do call set Source=%%Source%% %%i
-node tsc.js -target ES5 -out ..\Build\Debug\javascript.js lib.d.ts %Source%
+node tsc.js -target ES5 -out ..\Build\Debug\javascript.js ..\Library\lib.d.ts %Source%
 echo Building 'Debug\css.js\'.
 set Source=
 for %%i in ("..\Source\Css\*.ts") do call set Source=%%Source%% %%i
-node tsc.js -target ES5 -out ..\Build\Debug\css.js lib.d.ts %Source%
+node tsc.js -target ES5 -out ..\Build\Debug\css.js ..\Library\lib.d.ts %Source%
 echo Building 'Debug\html.js\'.
 set Source=
 for %%i in ("..\Source\Html\*.ts") do call set Source=%%Source%% %%i
-node tsc.js -target ES5 -out ..\Build\Debug\html.js lib.d.ts %Source%
+node tsc.js -target ES5 -out ..\Build\Debug\html.js ..\Library\lib.d.ts %Source%
 
 echo Building 'Release\texteditor.js'.
 node minify.js ..\Build\Debug\texteditor.js ..\Build\Release\texteditor.js

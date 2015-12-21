@@ -16,15 +16,15 @@ cp ../Samples/demo_css.html ../Build/Debug/
 cp ../Samples/demo_css.html ../Build/Release/
 
 echo Building \'Debug/texteditor.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/texteditor.js lib.d.ts libex.d.ts ../Source/TextEditor/*.ts
+node tsc.js -target ES5 -out ../Build/Debug/texteditor.js ../Library/lib.d.ts ../Library/libex.d.ts ../Source/TextEditor/*.ts
 
 if [ -f ../Build/Debug/texteditor.js ]; then
 echo Building \'Debug/javascript.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/javascript.js lib.d.ts ../Source/JavaScript/*.ts
+node tsc.js -target ES5 -out ../Build/Debug/javascript.js ../Library/lib.d.ts ../Source/JavaScript/*.ts
 echo Building \'Debug/css.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/css.js lib.d.ts ../Source/Css/*.ts
+node tsc.js -target ES5 -out ../Build/Debug/css.js ../Library/lib.d.ts ../Source/Css/*.ts
 echo Building \'Debug/html.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/html.js lib.d.ts ../Source/Html/*.ts
+node tsc.js -target ES5 -out ../Build/Debug/html.js ../Library/lib.d.ts ../Source/Html/*.ts
 fi
 
 echo Building \'Release/textditor.js\'.
