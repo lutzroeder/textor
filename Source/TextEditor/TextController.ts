@@ -47,7 +47,7 @@ module Textor
 			this._textArea.style.top = "0";
 			this._textArea.style.left = "0";
 			this._textArea.style.width = "0";
-			this._textArea.style.height = "0";	
+			this._textArea.style.height = "0";
 			this._textArea.style.zIndex = "-99999";
 			this._textArea.style.margin = "0";
 			this._textArea.style.border = "0";
@@ -59,7 +59,7 @@ module Textor
 			this._textArea.value = ".";
 			document.body.appendChild(this._textArea);
 			this.updateTextAreaPosition();
-			
+
 			this._canvas_mouseDownHandler = (e: MouseEvent) => { this.canvas_mouseDown(e); }
 			this._canvas_mouseWheelHandler = (e: MouseWheelEvent) => { this.canvas_mouseWheel(e); }
 			this._canvas_touchStartHandler = (e: TouchEvent) => { this.canvas_touchStart(e); }
@@ -117,7 +117,7 @@ module Textor
 			this._textArea.removeEventListener("paste", this._textArea_pasteHandler);
 			this._textArea.removeEventListener("beforecut", this._textArea_beforeCutHandler);
 			this._textArea.removeEventListener("beforecopy", this._textArea_beforeCopyHandler);
-			this._textArea.removeEventListener("keypress", this._textArea_keyPressHandler);	
+			this._textArea.removeEventListener("keypress", this._textArea_keyPressHandler);
 			this._textArea.removeEventListener("keyup", this._textArea_keyUpHandler);
 			this._textArea.removeEventListener("keydown", this._textArea_keyDownHandler);
 		}
@@ -161,7 +161,7 @@ module Textor
 			if (this._isMozilla)
 			{
 				this._textArea.value = "";
-				window.setTimeout(function() { 
+				window.setTimeout(function() {
 					var text = this._textArea.value;
 					if (text.length > 0)
 					{
@@ -257,7 +257,7 @@ module Textor
 		private window_mouseUp(e: MouseEvent)
 		{
 			e.preventDefault();
-			this.updatePointerPosition(e.pageX, e.pageY);	
+			this.updatePointerPosition(e.pageX, e.pageY);
 			this.pointerUp();
 		}
 
@@ -342,16 +342,16 @@ module Textor
 		private textArea_keyPress(e: KeyboardEvent)
 		{
 			var keyCode;
-			
+
 			if (this._isMozilla)
 			{
 				if (!(this._keyCodeTable))
 				{
 					this._keyCodeTable = [];
 					var charCodeTable: any = {
-						32: ' ',  48: '0',  49: '1',  50: '2',  51: '3',  52: '4', 53:  '5',  54: '6',  55: '7',  56: '8',  57: '9',  59: ';',  61: '=', 
+						32: ' ',  48: '0',  49: '1',  50: '2',  51: '3',  52: '4', 53:  '5',  54: '6',  55: '7',  56: '8',  57: '9',  59: ';',  61: '=',
 						65:  'a', 66: 'b',  67: 'c',  68: 'd',  69: 'e',  70: 'f',  71: 'g', 72:  'h',  73: 'i',  74: 'j',  75: 'k',  76: 'l',  77: 'm',  78: 'n', 79:  'o', 80: 'p',  81: 'q',  82: 'r',  83: 's',  84: 't',  85: 'u', 86: 'v', 87: 'w',  88: 'x',  89: 'y',  90: 'z',
-						107: '+', 109: '-', 110: '.', 188: ',', 190: '.', 191: '/', 192: '`', 219: '[', 220: '\\', 221: ']', 222: '\"' 
+						107: '+', 109: '-', 110: '.', 188: ',', 190: '.', 191: '/', 192: '`', 219: '[', 220: '\\', 221: ']', 222: '\"'
 					}
 
 					for (keyCode in charCodeTable)
@@ -364,7 +364,7 @@ module Textor
 						}
 					}
 				}
-			
+
 				keyCode = ((e.charCode !== 0) && (this._keyCodeTable[e.charCode])) ? this._keyCodeTable[e.charCode] : e.keyCode;
 				if (this.processKey(keyCode, e.shiftKey, e.ctrlKey, e.altKey, e.metaKey))
 				{
@@ -438,7 +438,7 @@ module Textor
 			{
 				window.clearInterval(this._scrollTimer);
 				this._scrollTimer = null;
-			}	
+			}
 		}
 
 		private stopEvent(e)
@@ -463,18 +463,18 @@ module Textor
 				point.y += node.offsetTop;
 				node = <HTMLElement> node.offsetParent;
 			}
-			this._textArea.style.top = point.y + "px";	
-			this._textArea.style.left = point.x + "px";	
+			this._textArea.style.top = point.y + "px";
+			this._textArea.style.left = point.x + "px";
 		}
 
 		private updatePointerPosition(x, y)
 		{
-			this._pointerPosition = new Point(x, y);
+			this._pointerPosition = new Point(x * window.devicePixelRatio, y * window.devicePixelRatio);
 			var node: HTMLElement = this._canvas;
 			while (node !== null)
 			{
-				this._pointerPosition.x -= node.offsetLeft;
-				this._pointerPosition.y -= node.offsetTop;
+				this._pointerPosition.x -= node.offsetLeft * window.devicePixelRatio;
+				this._pointerPosition.y -= node.offsetTop * window.devicePixelRatio;
 				node = <HTMLElement> node.offsetParent;
 			}
 		}
@@ -491,7 +491,7 @@ module Textor
 			var textPosition: TextPosition = this.getTextCoordinate();
 			textPosition.line += this._textEditor.scrollPosition.line;
 			textPosition.column += this._textEditor.scrollPosition.column;
-			return textPosition;	
+			return textPosition;
 		}
 
 		private processKey(keyCode: number, shiftKey: boolean, ctrlKey: boolean, altKey: boolean, metaKey: boolean)
@@ -503,12 +503,12 @@ module Textor
 					if (keyCode === 65) // CTRL-A
 					{
 						ctrlKey = false;
-						keyCode = 36; // HOME				
+						keyCode = 36; // HOME
 					}
 					else if (keyCode === 69) // CTRL-E
 					{
 						ctrlKey = false;
-						keyCode = 35; // END				
+						keyCode = 35; // END
 					}
 				}
 				else if (metaKey && keyCode === 37) // COMMAND+LEFT
