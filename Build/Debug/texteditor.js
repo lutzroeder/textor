@@ -832,11 +832,11 @@ var Textor;
             this._textArea.style.left = point.x + "px";
         };
         TextController.prototype.updatePointerPosition = function (x, y) {
-            this._pointerPosition = new Textor.Point(x, y);
+            this._pointerPosition = new Textor.Point(x * window.devicePixelRatio, y * window.devicePixelRatio);
             var node = this._canvas;
             while (node !== null) {
-                this._pointerPosition.x -= node.offsetLeft;
-                this._pointerPosition.y -= node.offsetTop;
+                this._pointerPosition.x -= node.offsetLeft * window.devicePixelRatio;
+                this._pointerPosition.y -= node.offsetTop * window.devicePixelRatio;
                 node = node.offsetParent;
             }
         };
@@ -856,11 +856,11 @@ var Textor;
                 if (ctrlKey && !shiftKey && !altKey && !metaKey) {
                     if (keyCode === 65) {
                         ctrlKey = false;
-                        keyCode = 36; // HOME				
+                        keyCode = 36; // HOME
                     }
                     else if (keyCode === 69) {
                         ctrlKey = false;
-                        keyCode = 35; // END				
+                        keyCode = 35; // END
                     }
                 }
                 else if (metaKey && keyCode === 37) {
