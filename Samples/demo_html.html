@@ -16,20 +16,20 @@ body    { background: #fff; margin-left: 0; margin-right: 0; margin-top: 0; }
 //<![CDATA[
 function document_load()
 {
-	var editor = new Textor.TextEditor(document.getElementById("editor"));
-	editor.language = new Textor.HtmlLanguage({ "text/css": new Textor.CssLanguage(), "text/javascript": new Textor.JavaScriptLanguage() });
-	editor.focus();
+    var editor = new Textor.TextEditor(document.getElementById("editor"));
+    editor.language = new Textor.HtmlLanguage({ "text/css": new Textor.CssLanguage(), "text/javascript": new Textor.JavaScriptLanguage() });
+    editor.focus();
 
-	var request = new XMLHttpRequest()
-	request.open("GET", "demo_html.html", true);
-	request.onreadystatechange = function ()
-	{
-		if (request.readyState === 4)
-		{
-			editor.text = request.responseText;
-		}
-	}
-	request.send(null);
+    var request = new XMLHttpRequest()
+    request.open("GET", "demo_html.html", true);
+    request.onreadystatechange = function ()
+    {
+        if (request.readyState === 4)
+        {
+            editor.text = request.responseText;
+        }
+    }
+    request.send(null);
 }
 //]]>
 </script>
@@ -37,8 +37,8 @@ function document_load()
 <body onload="document_load();">
 <br/>
 <br/>
-<div style="margin-left: auto; margin-right: auto; width: 1000px; height:750px;">
-<canvas id="editor" width="1000" height="750" tabindex="1"></canvas>
+<div style="margin-left: auto; margin-right: auto; width: 1000px;">
+<canvas id="editor" style="width:1000px;height:750px" tabindex="1"></canvas>
 </div>
 </body>
 </html>

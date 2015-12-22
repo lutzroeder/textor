@@ -6,12 +6,12 @@ interface Array<T>
 
 Array.prototype.remove = function(obj)
 {
-	var i = this.length;
-	while (i--)
-	{
-		if (this[i] == obj)
-		{
-			this.splice(i, 1);
-		}
-	}
+    var i = this.length;
+    while (i--)
+    {
+        if (this[i] == obj)
+        {
+            this.splice(i, 1);
+        }
+    }
 }

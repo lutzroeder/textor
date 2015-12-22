@@ -5,71 +5,70 @@
 <title>Textor CSS Sample</title>
 <meta http-equiv="X-UA-Compatible" content="IE=9" />
 <style type="text/css">
-body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
-#editor       { background: #000000; padding: 0px; border: 1px solid #404040; }
+body    { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
+#editor { background: #000000; padding: 0px; border: 1px solid #404040; width: 1024px; height: 500px }
 </style>
 <script type="text/javascript" src="texteditor.js"></script>
 <script type="text/javascript" src="css.js"></script>
+<div id="data" style="display:none">
+
+@import url("foo.css");
+
+@media print
+{
+    /* comment */
+    h1 { font-family: "Verdana" }
+}
+
+@media screen {  /* hide from IE3 */
+    a[href]:hover { background: #ffa }
+}
+
+html { -webkit-text-size-adjust: none; }
+
+a:active {
+    font-size:2px;
+}
+
+/* comment */
+div { padding: 10px; }
+
+.class { position: absolute; /* comment */ top: 18px; left: 18px; width: 175px; padding: 10px; background-color:#000; color:#fff; }
+.element { width: 500px; margin-left: 215px; }
+
+BDO[DIR="rtl"] { direction: rtl; unicode-bidi: bidi-override }
+*[DIR="ltr"] { direction: ltr; unicode-bidi: embed }
+
+body {
+    background-image: url(http://www.w3.org/StyleSheets/TR/logo-WD);
+}
+</div>
 <script type="text/javascript">
 //<![CDATA[
-
-var content = "\
-@import url('foo.css');\n\
-\n\
-@media print\n\
-{\n\
-	/* comment */\n\
-	h1 { font-family: 'Verdana' }\n\
-}\n\
-\n\
-@media screen {  /* hide from IE3 */\n\
-	a[href]:hover { background: #ffa }\n\
-}\n\
-\n\
-html { -webkit-text-size-adjust: none; }\n\
-\n\
-a:active {\n\
-	font-size:2px;\n\
-}\n\
-\n\
-/* comment */\n\
-div { padding: 10px; }\n\
-\n\
-.class { position: absolute; /* comment */ top: 18px; left: 18px; width: 175px; padding: 10px; background-color:#000; color:#fff; }\n\
-.element { width: 500px; margin-left: 215px; }\n\
-\n\
-BDO[DIR='rtl'] { direction: rtl; unicode-bidi: bidi-override }\n\
-*[DIR='ltr'] { direction: ltr; unicode-bidi: embed }\n\
-\n\
-body {\n\
-	background-image: url(http://www.w3.org/StyleSheets/TR/logo-WD);\n\
-}\n\
-";
-
 function document_load()
 {
-	var editor = new Textor.TextEditor(document.getElementById("editor"));
-	editor.language = new Textor.CssLanguage();
-	editor.theme = { 
-		"fontFamily": "Menlo,Lucida Console,Courier New", 
-		"fontSize": "13", 
-		"backgroundColor": "#202020",
-		"backgroundBlurColor": "#000000",
-		"selectionColor": "#383838", 
-		"selectionBlurColor": "#282828", 
-		"cursorColor": "#FFFFFF", 
-		"cursorBackgroundColor": "#333333",
-		"textStyle": "#FFFFFF", 
-		"commentStyle": "#AAAAAA italic",
-		"literalStyle": "#998888",
-		"keywordStyle": "#808880 bold",
-		"punctuationStyle": "#888888",
-		"declarationStyle": "#FFFFFF italic",
-		"attributeStyle": "#AAAAAA bold",
-		"elementStyle": "#CCCCCC bold",
-		"errorStyle": "#AA0000 bold" };
-	editor.focus();
-	editor.text = content;
+    var editor = new Textor.TextEditor(document.getElementById("editor"));
+    editor.language = new Textor.CssLanguage();
+    editor.theme = { 
+        "fontFamily": "Menlo,Lucida Console,Courier New", 
+        "fontSize": "13", 
+        "backgroundColor": "#202020",
+        "backgroundBlurColor": "#000000",
+        "selectionColor": "#383838", 
+        "selectionBlurColor": "#282828", 
+        "cursorColor": "#FFFFFF", 
+        "cursorBackgroundColor": "#333333",
+        "textStyle": "#FFFFFF", 
+        "commentStyle": "#AAAAAA italic",
+        "literalStyle": "#998888",
+        "keywordStyle": "#808880 bold",
+        "punctuationStyle": "#888888",
+        "declarationStyle": "#FFFFFF italic",
+        "attributeStyle": "#AAAAAA bold",
+        "elementStyle": "#CCCCCC bold",
+        "errorStyle": "#AA0000 bold" };
+    editor.focus();
+    editor.text = document.querySelector("#data").textContent;
 }
 //]]>
 </script>
@@ -77,8 +76,8 @@ function document_load()
 <body onload="document_load();">
 <br/>
 <br/>
-<div style="margin-left: auto; margin-right: auto; width: 1024px; height:500px;">
-<canvas id="editor" width="1024" height="500" tabindex="1"></canvas>
+<div style="margin-left: auto; margin-right: auto; width: 1024px;">
+<canvas id="editor" width="2048" height="1000" tabindex="1"></canvas>
 </div>
 </body>
 </html>

@@ -1,7 +1,7 @@
 module Textor
 {
-	export interface TextChangeHandler
-	{
-		(e: TextChangeEvent): void;
-	}
+    export interface TextChangeHandler
+    {
+        (e: TextChangeEvent): void;
+    }
 }

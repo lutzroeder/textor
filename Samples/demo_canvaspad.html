@@ -9,20 +9,10 @@
 <style type="text/css">
 body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
 #canvas       { background: #000000; padding: 0px; border: 1px solid #444a54; margin-bottom: 12px; float: left; }
-#editor       {
-	background: #000000;
-	padding: 0px;
-	border: 1px solid #444a54;
-	border-left: none;
-	width: 600px;
-	height: 400px;
-}
+#editor       { background: #000000; padding: 0px; border: 1px solid #444a54; border-left: none; }
 #editor.focus { background: #22252a; outline: none; }
-.source {
-	display: none;
-}
 </style>
-<div class='source'>
+<div id="data" style="display:none">
 context.strokeStyle = "#fff";
 
 // draw grid of rounded rectangles
@@ -31,58 +21,59 @@ context.fillStyle = "#fff";
 
 for (var i = 0; i < 4; i++)
 {
-	for (var j = 0; j < 4; j++)
-	{
-		roundedRect(85 + 60 * i, 85 + 60 * j, 50, 50, 10);
-		if (i % 4 == j)
-		{
-			context.fill();
-		}
-		context.stroke();
-	}
+    for (var j = 0; j < 4; j++)
+    {
+        roundedRect(85 + 60 * i, 85 + 60 * j, 50, 50, 10);
+        if (i % 4 == j)
+        {
+            context.fill();
+        }
+        context.stroke();
+    }
 }
 
 function roundedRect(x, y, width, height, radius)
 {
-	context.beginPath();
-	context.moveTo(x + radius, y);
-	context.lineTo(x + width - radius, y);
-	context.quadraticCurveTo(x + width, y, x + width, y + radius);
-	context.lineTo(x + width, y + height - radius);
-	context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-	context.lineTo(x + radius, y + height);
-	context.quadraticCurveTo(x, y + height, x, y + height - radius);
-	context.lineTo(x, y + radius);
-	context.quadraticCurveTo(x, y, x + radius, y);
-	context.closePath();
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + radius);
+    context.lineTo(x + width, y + height - radius);
+    context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    context.lineTo(x + radius, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - radius);
+    context.lineTo(x, y + radius);
+    context.quadraticCurveTo(x, y, x + radius, y);
+    context.closePath();
 }
 </div>
 <script type="text/javascript">
+//<![CDATA[
 var editor = null;
 
 function document_load()
 {
-	editor = new Textor.TextEditor(document.getElementById("editor"));
-	editor.addEventListener("textchanged", update);
-	editor.language = new Textor.JavaScriptLanguage();
-	editor.theme = {
-		"fontFamily": "Menlo,Lucida Console,Courier New",
-		"fontSize": "26",
-		"backgroundColor": "#22252A",
-		"backgroundBlurColor": "#000000",
-		"selectionColor": "#3C424C",
-		"selectionBlurColor": "#33373F",
-		"cursorColor": "#FFFFFF",
-		"cursorBackgroundColor": "#33373F",
-		"textStyle": "#FFFFFF",
-		"commentStyle": "#AAAAAA italic",
-		"literalStyle": "#997777",
-		"keywordStyle": "#82A0C0",
-		"punctuationStyle": "#888888",
-		"declarationStyle": "#FFFFFF italic",
-		"errorStyle": "AA0000 bold" };
-	editor.focus();
-	editor.text = document.querySelector('.source').textContent;
+    editor = new Textor.TextEditor(document.getElementById("editor"));
+    editor.addEventListener("textchanged", update);
+    editor.language = new Textor.JavaScriptLanguage();
+    editor.theme = {
+        "fontFamily": "Menlo,Lucida Console,Courier New",
+        "fontSize": "13",
+        "backgroundColor": "#22252A",
+        "backgroundBlurColor": "#000000",
+        "selectionColor": "#3C424C",
+        "selectionBlurColor": "#33373F",
+        "cursorColor": "#FFFFFF",
+        "cursorBackgroundColor": "#33373F",
+        "textStyle": "#FFFFFF",
+        "commentStyle": "#AAAAAA italic",
+        "literalStyle": "#997777",
+        "keywordStyle": "#82A0C0",
+        "punctuationStyle": "#888888",
+        "declarationStyle": "#FFFFFF italic",
+        "errorStyle": "AA0000 bold" };
+    editor.focus();
+    editor.text = document.querySelector("#data").textContent;
 }
 
 var canvas = null;
@@ -90,26 +81,27 @@ var context = null;
 
 function update()
 {
-	if (context === null)
-	{
-		canvas = document.getElementById("canvas");
-		context = canvas.getContext("2d");
-	}
+    if (context === null)
+    {
+        canvas = document.getElementById("canvas");
+        context = canvas.getContext("2d");
+    }
 
-	context.save();
-	context.clearRect(0, 0, canvas.width, canvas.height);
-	try
-	{
-		window.eval(editor.text);
-	}
-	catch (exception)
-	{
-		context.font = "bold 13px Menlo,Lucida Console,Courier New";
-		context.fillStyle = "#a00";
-		context.fillText(exception.toString(), 8, 18);
-	}
-	context.restore();
+    context.save();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    try
+    {
+        window.eval(editor.text);
+    }
+    catch (exception)
+    {
+        context.font = "bold 13px Menlo,Lucida Console,Courier New";
+        context.fillStyle = "#a00";
+        context.fillText(exception.toString(), 8, 18);
+    }
+    context.restore();
 }
+//]]>
 </script>
 
 </head>
@@ -119,7 +111,7 @@ function update()
 <br/>
 <div style="margin-left: auto; margin-right: auto; width: 1020px;">
 <canvas id="canvas" width="400" height="400"></canvas>
-<canvas id="editor" width="1200" height="800" tabindex="1"></canvas>
+<canvas id="editor" style="width:600px;height:400px;" tabindex="1"></canvas>
 </div>
 </body>
 
