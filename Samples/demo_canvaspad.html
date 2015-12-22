@@ -51,8 +51,7 @@ function roundedRect(x, y, width, height, radius)
 //<![CDATA[
 var editor = null;
 
-function document_load()
-{
+function document_load() {
     editor = new Textor.TextEditor(document.getElementById("editor"));
     editor.addEventListener("textchanged", update);
     editor.language = new Textor.JavaScriptLanguage();
@@ -79,22 +78,18 @@ function document_load()
 var canvas = null;
 var context = null;
 
-function update()
-{
-    if (context === null)
-    {
+function update() {
+    if (context === null) {
         canvas = document.getElementById("canvas");
         context = canvas.getContext("2d");
     }
 
     context.save();
     context.clearRect(0, 0, canvas.width, canvas.height);
-    try
-    {
+    try {
         window.eval(editor.text);
     }
-    catch (exception)
-    {
+    catch (exception) {
         context.font = "bold 13px Menlo,Lucida Console,Courier New";
         context.fillStyle = "#a00";
         context.fillText(exception.toString(), 8, 18);
@@ -103,9 +98,7 @@ function update()
 }
 //]]>
 </script>
-
 </head>
-
 <body onload="document_load()">
 <br/>
 <br/>
@@ -114,5 +107,4 @@ function update()
 <canvas id="editor" style="width:600px;height:400px;" tabindex="1"></canvas>
 </div>
 </body>
-
 </html>

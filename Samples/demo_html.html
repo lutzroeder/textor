@@ -14,18 +14,18 @@ body    { background: #fff; margin-left: 0; margin-right: 0; margin-top: 0; }
 <script type="text/javascript" src="html.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-function document_load()
-{
+function document_load() {
     var editor = new Textor.TextEditor(document.getElementById("editor"));
+    editor.theme = {
+        "fontFamily": "Menlo,Lucida Console,Courier New",
+        "fontSize": "13" };
     editor.language = new Textor.HtmlLanguage({ "text/css": new Textor.CssLanguage(), "text/javascript": new Textor.JavaScriptLanguage() });
     editor.focus();
 
     var request = new XMLHttpRequest()
     request.open("GET", "demo_html.html", true);
-    request.onreadystatechange = function ()
-    {
-        if (request.readyState === 4)
-        {
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
             editor.text = request.responseText;
         }
     }

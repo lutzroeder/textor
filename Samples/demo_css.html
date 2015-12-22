@@ -11,7 +11,6 @@ body    { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
 <script type="text/javascript" src="texteditor.js"></script>
 <script type="text/javascript" src="css.js"></script>
 <div id="data" style="display:none">
-
 @import url("foo.css");
 
 @media print
@@ -45,8 +44,7 @@ body {
 </div>
 <script type="text/javascript">
 //<![CDATA[
-function document_load()
-{
+function document_load() {
     var editor = new Textor.TextEditor(document.getElementById("editor"));
     editor.language = new Textor.CssLanguage();
     editor.theme = { 
@@ -73,7 +71,7 @@ function document_load()
 //]]>
 </script>
 </head>
-<body onload="document_load();">
+<body onload="document_load()">
 <br/>
 <br/>
 <div style="margin-left: auto; margin-right: auto; width: 1024px;">

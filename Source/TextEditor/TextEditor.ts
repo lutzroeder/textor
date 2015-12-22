@@ -603,7 +603,15 @@ module Textor
 
         public get devicePixelRatio(): number
         {
-            return (('devicePixelRatio' in window) && (window.devicePixelRatio > 1)) ? window.devicePixelRatio : 1;
+            if (('devicePixelRatio' in window) && (window.devicePixelRatio > 1))
+            {
+                return window.devicePixelRatio;
+            }
+            if (('deviceXDPI' in window.screen) && ('logicalXDPI' in window.screen))
+            {
+                return window.screen.deviceXDPI / window.screen.logicalXDPI;
+            }
+            return 1;
         }
 
         private getMaxColumns(): number

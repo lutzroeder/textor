@@ -13,8 +13,7 @@ body          { background: #000000; margin-left: 0; margin-right: 0; margin-top
 <script type="text/javascript" src="javascript.js"></script>
 <script type="text/javascript">
 //<![CDATA[
-function document_load()
-{
+function document_load() {
     var editor = new Textor.TextEditor(document.getElementById("editor"));
     editor.language = new Textor.JavaScriptLanguage();
     editor.theme = { 
@@ -37,10 +36,8 @@ function document_load()
     
     var request = new XMLHttpRequest()
     request.open("GET", "texteditor.js", true);
-    request.onreadystatechange = function ()
-    {
-        if (request.readyState === 4)
-        {
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
             editor.text = request.responseText;
         }
     }
@@ -49,7 +46,7 @@ function document_load()
 //]]>
 </script>
 </head>
-<body onload="document_load();">
+<body onload="document_load()">
 <br/>
 <br/>
 <div style="margin-left: auto; margin-right: auto; width: 1000px;">
