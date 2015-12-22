@@ -28,8 +28,6 @@ module Textor
         {
             this._canvas = canvas;
 
-            // this._canvas.style.width = this._canvas.clientWidth + "px";
-            // this._canvas.style.height = this._canvas.clientHeight + "px";
             this._canvas.width = this._canvas.clientWidth * this.devicePixelRatio;
             this._canvas.height = this._canvas.clientHeight * this.devicePixelRatio;
 
