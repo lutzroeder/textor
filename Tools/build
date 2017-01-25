@@ -2,7 +2,11 @@
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-rm -f -r ../Build
+npm install
+typescript=./node_modules/typescript/lib
+
+rm -f -r ../Build/Debug
+rm -f -r ../Build/Release
 mkdir -p ../Build/Debug
 mkdir -p ../Build/Release
 
@@ -16,15 +20,15 @@ cp ../Samples/demo_css.html ../Build/Debug/
 cp ../Samples/demo_css.html ../Build/Release/
 
 echo Building \'Debug/texteditor.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/texteditor.js ../Library/lib.d.ts ../Library/libex.d.ts ../Source/TextEditor/*.ts
+node tsc.js -target ES5 -out ../Build/Debug/texteditor.js ${typescript}/lib.d.ts ./libex.d.ts ../Source/TextEditor/*.ts
 
 if [ -f ../Build/Debug/texteditor.js ]; then
 echo Building \'Debug/javascript.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/javascript.js ../Library/lib.d.ts ../Source/JavaScript/*.ts
+node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/javascript.js ${typescript}//lib.d.ts ../Source/JavaScript/*.ts
 echo Building \'Debug/css.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/css.js ../Library/lib.d.ts ../Source/Css/*.ts
+node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/css.js ${typescript}//lib.d.ts ../Source/Css/*.ts
 echo Building \'Debug/html.js\'.
-node tsc.js -target ES5 -out ../Build/Debug/html.js ../Library/lib.d.ts ../Source/Html/*.ts
+node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/html.js ${typescript}//lib.d.ts ../Source/Html/*.ts
 fi
 
 echo Building \'Release/textditor.js\'.
