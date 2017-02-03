@@ -4,10 +4,11 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 npm install
 typescript=./node_modules/typescript/lib
+uglifyjs=./node_modules/uglify-js/bin
 
 rm -f -r ../Build
 
-echo $(tput bold)Building Debug$(tput sgr0)
+echo Building Debug
 mkdir -p ../Build/Debug
 cp ../Samples/demo_canvaspad.html ../Build/Debug/
 cp ../Samples/demo_javascript.html ../Build/Debug/
@@ -15,26 +16,26 @@ cp ../Samples/demo_html.html ../Build/Debug/
 cp ../Samples/demo_css.html ../Build/Debug/
 node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/texteditor.js ${typescript}/lib.d.ts ./libex.d.ts ../Source/TextEditor/*.ts
 if [ -f ../Build/Debug/texteditor.js ]; then
-echo Building Debug/javascript.js
-node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/javascript.js ${typescript}//lib.d.ts ../Source/JavaScript/*.ts
-echo Building Debug/css.js
-node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/css.js ${typescript}//lib.d.ts ../Source/Css/*.ts
-echo Building Debug/html.js
-node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/html.js ${typescript}//lib.d.ts ../Source/Html/*.ts
+  echo Building Debug/javascript.js
+  node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/javascript.js ${typescript}//lib.d.ts ../Source/JavaScript/*.ts
+  echo Building Debug/css.js
+  node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/css.js ${typescript}//lib.d.ts ../Source/Css/*.ts
+  echo Building Debug/html.js
+  node ${typescript}/tsc.js -target ES5 -out ../Build/Debug/html.js ${typescript}//lib.d.ts ../Source/Html/*.ts
 fi
 
-echo $(tput bold)Building Release$(tput sgr0)
+echo Building Release
 mkdir -p ../Build/Release
 cp ../Samples/demo_canvaspad.html ../Build/Release/
 cp ../Samples/demo_javascript.html ../Build/Release/
 cp ../Samples/demo_html.html ../Build/Release/
 cp ../Samples/demo_css.html ../Build/Release/
-node minify.js ../Build/Debug/texteditor.js ../Build/Release/texteditor.js
+${uglifyjs}/uglifyjs ../Build/Debug/texteditor.js -o ../Build/Release/texteditor.js
 if [ -f ../Build/Release/texteditor.js ]; then
-echo Building Release/css.js
-node minify.js ../Build/Debug/css.js ../Build/Release/css.js
-echo Building Release/javascript.js
-node minify.js ../Build/Debug/javascript.js ../Build/Release/javascript.js
-echo Building Release/html.js
-node minify.js ../Build/Debug/html.js ../Build/Release/html.js
+  echo Building Release/css.js
+  ${uglifyjs}/uglifyjs ../Build/Debug/css.js -o ../Build/Release/css.js
+  echo Building Release/javascript.js
+  ${uglifyjs}/uglifyjs ../Build/Debug/javascript.js -o ../Build/Release/javascript.js
+  echo Building Release/html.js
+  ${uglifyjs}/uglifyjs ../Build/Debug/html.js -o ../Build/Release/html.js
 fi
