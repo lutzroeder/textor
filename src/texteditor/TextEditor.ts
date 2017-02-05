@@ -5,6 +5,7 @@ module Textor
         private _canvas: HTMLCanvasElement;
         private _context: CanvasRenderingContext2D;
         private _theme: ITheme;
+        private _themeManager: IThemeManager;
         private _undoService: UndoService = new UndoService();
         private _textChangingHandlers: TextChangeHandler[] = [];
         private _textChangedHandlers: TextChangeHandler[] = [];
@@ -27,10 +28,6 @@ module Textor
         constructor(canvas: HTMLCanvasElement)
         {
             this._canvas = canvas;
-
-            this._canvas.width = this._canvas.clientWidth * this.devicePixelRatio;
-            this._canvas.height = this._canvas.clientHeight * this.devicePixelRatio;
-
             this._context = canvas.getContext("2d");
 
             this._textBuffer_textChanging = (e: TextChangeEvent) => { this.textBuffer_textChanging(e); }
@@ -49,30 +46,10 @@ module Textor
 
             this._languageService = new LanguageService(this);
 
-            this._theme = {
-                "fontFamily": "Monaco,Lucida Console,Courier New",      
-                "fontSize": "12",
-                "paddingLeft": "4",
-                "paddingTop": "4",
-                "backgroundColor": "#ffffff",
-                "backgroundBlurColor": "#ffffff",
-                "selectionColor": "#c0ddf6",
-                "selectionBlurColor": "#e3f1fe",
-                "cursorColor": "#000000",
-                "cursorBackgroundColor": "#ededed",
-                "textStyle": "#000000",
-                "punctuationStyle": "#666666",
-                "commentStyle": "#0068c5 italic",
-                "keywordStyle": "#662266 bold",
-                "literalStyle": "#005a15",
-                "elementStyle": "#0000AA bold",
-                "attributeStyle": "#0000AA italic",
-                "errorStyle": "#FF0000 bold",
-                "declarationStyle": "#000000 bold" };
+            this._themeManager = new ThemeManager();
+            this._theme = this._themeManager.get("default");
 
-            this.updateFont();
-            this.invalidate();
-            this.update();
+            this.updateSize(this._canvas.clientWidth, this._canvas.clientHeight);
             this.focus();
         }
 
@@ -125,6 +102,11 @@ module Textor
         public get theme(): ITheme
         {
             return this._theme;
+        }
+
+        public get themeManager(): IThemeManager
+        {
+            return this._themeManager;
         }
 
         public get language(): ILanguage
@@ -573,6 +555,18 @@ module Textor
             }
         }
 
+        public updateSize(width: number, height: number)
+        {
+            this._canvas.style.width = width.toString();
+            this._canvas.style.height = height.toString();
+            this._canvas.width = width * this.devicePixelRatio;
+            this._canvas.height = height * this.devicePixelRatio;
+
+            this.updateFont();
+            this.invalidate();
+            this.update();
+        }
+
         private updateFont()
         {
             var fontSize: number = parseFloat(this._theme.fontSize) * this.devicePixelRatio;
@@ -712,10 +706,6 @@ module Textor
                 {
                     this._context.save();
 
-                    // erase all content 
-                    // this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
-                    // console.log("(" + clipRectangle.x + "," + clipRectangle.y + ")-(" + clipRectangle.width + "," + clipRectangle.height + ")");
-
                     // apply clip rectangle
                     this._context.beginPath();
                     this._context.rect(clipRectangle.x, clipRectangle.y, clipRectangle.width, clipRectangle.height);
@@ -790,17 +780,7 @@ module Textor
                         var themeProperties: string[] = theme.split(' ');
                         this._context.fillStyle = themeProperties[0];
                         this._context.font = ((themeProperties.length === 2) && (themeProperties[1] === "italic")) ? ("italic " + font) : font;
-                        if ((themeProperties.length === 2) && (themeProperties[1] === "bold"))
-                        {
-                            // fake bold by adding a shadow
-                            this._context.shadowBlur = (this._textController.isMozilla) ? 0.5 : 1;
-                            this._context.shadowColor = themeProperties[0];
-                        }
-                        else
-                        {
-                            this._context.shadowBlur = 0;
-                            this._context.shadowColor = "rgba(0,0,0,0)";
-                        }
+                        this._context.font = ((themeProperties.length === 2) && (themeProperties[1] === "bold")) ? ("bold " + font) : font;
 
                         var y = Math.floor(fontSize.height * 0.8) + paddingTop;
                         for (var line = this._scrollPosition.line; line < (this._scrollPosition.line + size.line); line++)

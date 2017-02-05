@@ -1,11 +1,10 @@
 
-
 interface CSSStyleDeclaration {
     resize: string;
 }
 
 interface Event {
-	wheelDelta: number;
+    wheelDelta: number;
 }
 
 interface DragEvent {
