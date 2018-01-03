@@ -2,7 +2,7 @@ declare module Textor
 {
     interface ILanguage
     {
-        begin(textReader: TextReader, state: string);
+        begin(textReader: ITextReader, state: string);
         read(): ILanguageStyle;
     }
 }

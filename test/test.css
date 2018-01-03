@@ -1,0 +1,30 @@
+@import url('foo.css');
+
+@media print
+{
+	/* comment */
+	h1 { font-family: 'Verdana' }
+}
+
+@media screen {  /* hide from IE3 */
+	a[href]:hover { background: #ffa }
+}
+
+html { -webkit-text-size-adjust: none; }
+
+a:active {
+	font-size:2px;
+}
+
+/* comment */
+div { padding: 10px; }
+
+.class { position: absolute; /* comment */ top: 18px; left: 18px; width: 175px; padding: 10px; background-color:#000; color:#fff; }
+.element { width: 500px; margin-left: 215px; }
+
+BDO[DIR='rtl'] { direction: rtl; unicode-bidi: bidi-override }
+*[DIR='ltr'] { direction: ltr; unicode-bidi: embed }
+
+body {
+	background-image: url(http://www.w3.org/StyleSheets/TR/logo-WD);
+}

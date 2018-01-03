@@ -1,14 +1,17 @@
 {
-  "private": true,
-  "scripts": {
-    "start": "npm install && gulp",
-    "build": "npm install && gulp build"
+  "name": "textor",
+  "productName": "Textor",
+  "author": {
+    "name": "Lutz Roeder",
+    "email": "lutzroeder@users.noreply.github.com",
+    "url": "https://www.lutzroeder.com"
   },
+  "version": "0.1.1",
+  "license": "MIT",
+  "repository": "lutzroeder/textor",
   "devDependencies": {
-    "typescript": "latest",
-    "gulp": "latest",
-    "gulp-typescript": "latest",
-    "gulp-uglify": "latest",
-    "gulp-open": "latest"
+    "tslint": "5.17.0",
+    "typescript": "3.5.1",
+    "uglify-js": "3.6.0"
   }
 }

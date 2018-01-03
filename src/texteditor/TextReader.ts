@@ -1,6 +1,6 @@
 module Textor
 {
-    export class TextReader
+    export class TextReader implements ITextReader
     {
         private _textBuffer: TextBuffer;
         private _textPosition: TextPosition = new TextPosition(0, 0);

@@ -3,7 +3,7 @@ module Textor
     export class HtmlLanguage implements ILanguage
     {
         private _languages: any[];
-        private _textReader: TextReader;
+        private _textReader: ITextReader;
         private _tokenStack: any[] = [];
         private _languageToken: any;
         private _state: string;
@@ -15,7 +15,7 @@ module Textor
             this._languages = languages;
         }
 
-        public begin(textReader: TextReader, state: string)
+        public begin(textReader: ITextReader, state: string)
         {
             this._textReader = textReader;
             this._tokenStack = [ { type: this.readText } ];

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outFile": "../../dist/html.js",
+    "sourceMap": true
+  },
+  "include": [
+    "*.ts",
+    "../texteditor/*.d.ts",
+    "../../lib/libex.d.ts"
+  ]
+}

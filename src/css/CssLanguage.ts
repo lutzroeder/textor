@@ -2,12 +2,12 @@ module Textor
 {
     export class CssLanguage implements ILanguage
     {
-        private _textReader: TextReader = null;
+        private _textReader: ITextReader = null;
         private _tokenStack: any[];
         private _token: any = null;
         private _state: string;
 
-        public begin(textReader: TextReader, state: string)
+        public begin(textReader: ITextReader, state: string)
         {
             this._textReader = textReader;
             this._tokenStack = [ { type: this.readStylesheet, selector: 0, bracket: 0, literal: false, keyword: false, start: true } ];

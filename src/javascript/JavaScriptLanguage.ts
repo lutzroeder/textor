@@ -9,12 +9,12 @@ module Textor
         private _literals = { 'true': true, 'false': true, 'null': true, 'undefinded': true, 'NaN': true, 'Infinity': true };
         private _operators = { 'in': true, 'typeof': true, 'instanceof': true, 'new': true };
         private _locals = { 'this': true, 'arguments': true };
-        private _textReader: TextReader;
+        private _textReader: ITextReader;
         private _state: string;
         private _tokenStack: any[];
         private _token: any;
 
-        public begin(textReader: TextReader, state: string)
+        public begin(textReader: ITextReader, state: string)
         {
             this._textReader = textReader;
             this._tokenStack = [ { type: this.readBlockStatement, state: 'root' } ];

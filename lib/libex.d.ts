@@ -14,3 +14,8 @@ interface DragEvent {
 interface Window {
     clipboardData: DataTransfer;
 }
+
+interface Screen {
+    deviceXDPI: number;
+    logicalXDPI: number;
+}
