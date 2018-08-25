@@ -1,0 +1,39 @@
+<html>
+<head>
+<title>Textor HTML Sample</title>
+<script type="text/javascript" src="texteditor.js"></script>
+<script type="text/javascript" src="javascript.js"></script>
+<script type="text/javascript" src="css.js"></script>
+<script type="text/javascript" src="html.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+var editor = null;
+function document_load() {
+    editor = new Textor.TextEditor(document.getElementById("editor"));
+    editor.language = new Textor.HtmlLanguage({ 
+        "text/css": new Textor.CssLanguage(), 
+        "text/javascript": new Textor.JavaScriptLanguage()
+    });
+    editor.focus();
+    document_resize();
+    var request = new XMLHttpRequest()
+    request.open("GET", "demo_html.html", true);
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            editor.text = request.responseText;
+        }
+    }
+    request.send(null);
+}
+function document_resize() {
+    if (editor) {
+        editor.updateSize(window.innerWidth, window.innerHeight);
+    }
+}
+//]]>
+</script>
+</head>
+<body onload="document_load()" onresize="document_resize()" style="margin: 0">
+<canvas id="editor" tabindex="1"></canvas>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>Textor HTML5 Sample</title>
+<script type="text/javascript" src="texteditor.js"></script>
+<script type="text/javascript" src="javascript.js"></script>
+<style type="text/css">
+body          { background: #000000; margin-left: 0; margin-right: 0; margin-top: 0; }
+#canvas       { background: #000000; padding: 0px; border: 1px solid #444a54; }
+#editor       { background: #000000; padding: 0px; border: 1px solid #444a54; border-top: none; }
+#editor.focus { background: #22252a; outline: none; }
+</style>
+<div id="data" style="display:none">// draw grid of rounded rectangles
+context.lineWidth = 2;
+context.strokeStyle = "#bbb";
+context.fillStyle = "#999";
+
+for (var i = 0; i < 9; i++) {
+    for (var j = 0; j < 4; j++) {
+        roundedRect(30 + 60 * i, 40 + 60 * j, 50, 50, 26 - (i * 2));
+        if (i % 4== j) {
+            context.fill();
+        }
+        context.stroke();
+    }
+}
+
+function roundedRect(x, y, width, height, radius) {
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + radius);
+    context.lineTo(x + width, y + height - radius);
+    context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    context.lineTo(x + radius, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - radius);
+    context.lineTo(x, y + radius);
+    context.quadraticCurveTo(x, y, x + radius, y);
+    context.closePath();
+}
+</div>
+<script type="text/javascript">
+//<![CDATA[
+var editor = null;
+function document_load() {
+    editor = new Textor.TextEditor(document.getElementById("editor"));
+    editor.addEventListener("textchanged", update);
+    editor.language = new Textor.JavaScriptLanguage();
+    editor.theme = editor.themeManager.get("dark");
+    editor.focus();
+    editor.text = document.querySelector("#data").textContent;
+}
+var canvas = null;
+var context = null;
+function update() {
+    if (context === null) {
+        canvas = document.getElementById("canvas");
+        context = canvas.getContext("2d");
+    }
+    context.save();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    try {
+        window.eval(editor.text);
+    }
+    catch (exception) {
+        context.font = "bold 13px Menlo,Lucida Console,Courier New";
+        context.fillStyle = "#a00";
+        context.fillText(exception.toString(), 8, 18);
+    }
+    context.restore();
+}
+//]]>
+</script>
+</head>
+<body onload="document_load()">
+<br/>
+<br/>
+<center>
+<canvas id="canvas" width="600" height="300"></canvas><br/>
+<canvas id="editor" style="width:600px;height:300px;" tabindex="1"></canvas>
+</center>
+</body>
+</html>
