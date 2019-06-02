@@ -1,58 +1,35 @@
-module Textor
-{
-    export class ContainerUndoUnit
-    {
+namespace Textor {
+
+    export class ContainerUndoUnit {
+
         private _undoUnits: IUndoUnit[] = [];
 
-        public add(undoUnit: IUndoUnit)
-        {
+        public add(undoUnit: IUndoUnit) {
             this._undoUnits.push(undoUnit);
         }
 
-        public undo()
-        {
-            for (var i: number = 0; i < this._undoUnits.length; i++)
-            {
-                this._undoUnits[i].undo();
+        public undo() {
+            for (const undoUnit of this._undoUnits) {
+                undoUnit.undo();
             }
         }
 
-        public redo()
-        {
-            for (var i: number = 0; i < this._undoUnits.length; i++)
-            {
-                this._undoUnits[i].redo();
+        public redo() {
+            for (const undoUnit of this._undoUnits) {
+                undoUnit.redo();
             }
         }
 
-        public get isEmpty(): boolean
-        {
-            if (this._undoUnits.length > 0)
-            {
-                for (var i: number = 0; i < this._undoUnits.length; i++)
-                {
-                    if (!this._undoUnits[i].isEmpty)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+        public get isEmpty(): boolean {
+            return this._undoUnits.length > 0 && this._undoUnits.every((undoUnit) => undoUnit.isEmpty);
         }
 
-        public get undoUnits(): IUndoUnit[]
-        {
+        public get undoUnits(): IUndoUnit[] {
             return this._undoUnits;
         }
 
-        public toString(): string
-        {   
-            var text: string = "Container:\n";
-            for (var i: number = 0; i < this._undoUnits.length; i++)
-            {
-                text += "\t" + this._undoUnits[i].toString() + "\n";
-            }
-            return text;
+        public toString(): string {
+            return "Container:\n" + this._undoUnits.map((item) => "\t" + item.toString()).join("\n");
         }
     }
 }

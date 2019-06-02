@@ -5,52 +5,34 @@ UGLIFY = ./node_modules/.bin/uglifyjs
 BUILD_DIR = ./dist
 PUBLISH_DIR = ./dist/gh-pages
 
-all: install clean build
-
-build: $(BUILD_DIR)/texteditor.min.js $(BUILD_DIR)/javascript.min.js $(BUILD_DIR)/html.min.js $(BUILD_DIR)/css.min.js $(BUILD_DIR)/demo_canvaspad.html $(BUILD_DIR)/demo_css.html  $(BUILD_DIR)/demo_html.html
-
-$(BUILD_DIR)/texteditor.js: ./src/texteditor/tsconfig.json
-	@$(TYPESCRIPT) -p $^
-
-$(BUILD_DIR)/texteditor.min.js: $(BUILD_DIR)/texteditor.js
-	@$(UGLIFY) $^ --source-map -o $@
-
-$(BUILD_DIR)/javascript.js: ./src/javascript/tsconfig.json
-	@$(TYPESCRIPT) -p $^
-
-$(BUILD_DIR)/javascript.min.js: $(BUILD_DIR)/javascript.js
-	@$(UGLIFY) $^ --source-map -o $@
-
-$(BUILD_DIR)/html.js: ./src/html/tsconfig.json
-	@$(TYPESCRIPT) -p $^
-
-$(BUILD_DIR)/html.min.js: $(BUILD_DIR)/html.js
-	@$(UGLIFY) $^ --source-map -o $@
-
-$(BUILD_DIR)/css.js: ./src/css/tsconfig.json
-	@$(TYPESCRIPT) -p $^
-
-$(BUILD_DIR)/css.min.js: $(BUILD_DIR)/css.js
-	@$(UGLIFY) $^ --source-map -o $@
-
-$(BUILD_DIR)/demo_canvaspad.html: ./samples/demo_canvaspad.html
-	@cp $^ $(BUILD_DIR)
-
-$(BUILD_DIR)/demo_css.html: ./samples/demo_css.html
-	@mkdir -p $(BUILD_DIR)
-	@cp $^ $(BUILD_DIR)
-
-$(BUILD_DIR)/demo_html.html: ./samples/demo_html.html
-	@mkdir -p $(BUILD_DIR)
-	@cp $^ $(BUILD_DIR)
-
-install: ./package.json
-	npm install --quiet
+all: install clean build lint
 
 clean:
 	@rm -rf $(BUILD_DIR)
 
-publish: install clean build
+install: ./package.json
+	npm install --quiet
+
+build:
+	npx tsc --project ./src/texteditor/tsconfig.json
+	npx tsc --project ./src/javascript/tsconfig.json
+	npx tsc --project ./src/html/tsconfig.json
+	npx tsc --project ./src/css/tsconfig.json
+	npx uglifyjs $(BUILD_DIR)/texteditor.js --source-map -o $(BUILD_DIR)/texteditor.min.js
+	npx uglifyjs $(BUILD_DIR)/javascript.js --source-map -o $(BUILD_DIR)/javascript.min.js
+	npx uglifyjs $(BUILD_DIR)/html.js --source-map -o $(BUILD_DIR)/html.min.js
+	npx uglifyjs $(BUILD_DIR)/css.js --source-map -o $(BUILD_DIR)/css.min.js
+	@cp ./samples/demo_canvaspad.html $(BUILD_DIR)
+	@cp ./samples/demo_css.html $(BUILD_DIR)
+	@cp ./samples/demo_html.html $(BUILD_DIR)
+
+lint:
+	npx tslint -c ./tslint.json --project ./src/texteditor/tsconfig.json
+	npx tslint -c ./tslint.json --project ./src/javascript/tsconfig.json
+	npx tslint -c ./tslint.json --project ./src/html/tsconfig.json
+	npx tslint -c ./tslint.json --project ./src/css/tsconfig.json
+
+publish: install clean build lint
 	rm -rf $(PUBLISH_DIR)
 	git clone git@github.com:lutzroeder/textor.git $(PUBLISH_DIR) --branch gh-pages
 	rm -rf $(PUBLISH_DIR)/*

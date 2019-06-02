@@ -1,7 +1,4 @@
-module Textor
-{
-    export interface SelectionChangeHandler
-    {
-        (e: SelectionChangeEvent): void;
-    }
+namespace Textor {
+
+    export type SelectionChangeHandler = (e: SelectionChangeEvent) => void;
 }

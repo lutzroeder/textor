@@ -1,7 +1,6 @@
-module Textor
-{
-    export interface IUndoUnit
-    {
+namespace Textor {
+
+    export interface IUndoUnit {
         isEmpty: boolean;
         undo(): void;
         redo(): void;

@@ -1,8 +1,8 @@
-declare module Textor
+declare namespace Textor
 {
     interface ILanguage
     {
-        begin(textReader: ITextReader, state: string);
+        begin(textReader: ITextReader, state: string): void;
         read(): ILanguageStyle;
     }
 }

@@ -1,7 +1,4 @@
-module Textor
-{
-    export interface TextChangeHandler
-    {
-        (e: TextChangeEvent): void;
-    }
+namespace Textor {
+
+    export type TextChangeHandler = (e: TextChangeEvent) => void;
 }

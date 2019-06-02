@@ -1,9 +1,8 @@
-module Textor
-{
-    export interface IThemeManager
-    {
-        add(name: string, theme: ITheme);
-        remove(name: string);
-        get(name: string): ITheme
+namespace Textor {
+
+    export interface IThemeManager {
+        add(name: string, theme: ITheme): void;
+        remove(name: string): void;
+        get(name: string): ITheme;
     }
 }

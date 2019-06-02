@@ -1,7 +1,6 @@
-module Textor
-{
-    export interface ITheme
-    {
+namespace Textor {
+
+    export interface ITheme {
         fontFamily: string;
         fontSize: string;
         paddingLeft: string;

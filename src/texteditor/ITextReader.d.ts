@@ -1,4 +1,4 @@
-declare module Textor
+declare namespace Textor
 {
     interface ITextReader
     {

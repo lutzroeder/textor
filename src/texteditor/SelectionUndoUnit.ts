@@ -1,51 +1,43 @@
-module Textor
-{
-    export class SelectionUndoUnit implements IUndoUnit
-    {
+namespace Textor {
+
+    export class SelectionUndoUnit implements IUndoUnit {
+
         private _textModel: TextModel;
         private _undoTextRange: TextRange;
         private _redoTextRange: TextRange;
 
-        constructor(textModel: TextModel, textRange: TextRange)
-        {
+        constructor(textModel: TextModel, textRange: TextRange) {
             this._textModel = textModel;
             this._redoTextRange = textRange;
             this._undoTextRange = this._textModel.getTextRange();
         }
 
-        public undo()
-        {
+        public undo() {
             this._textModel.selectRange(this._undoTextRange);
         }
 
-        public redo()
-        {
+        public redo() {
             this._textModel.selectRange(this._redoTextRange);
         }
 
-        public get isEmpty(): boolean
-        {
+        public get isEmpty(): boolean {
             return false;
         }
 
-        public merge(undoUnit): boolean
-        {
-            if (undoUnit instanceof SelectionUndoUnit)
-            {
-                var selectionUndoUnit: SelectionUndoUnit = undoUnit;
+        public merge(undoUnit): boolean {
+            if (undoUnit instanceof SelectionUndoUnit) {
+                const selectionUndoUnit: SelectionUndoUnit = undoUnit;
                 this._redoTextRange = selectionUndoUnit.redoTextRange;
                 return true;
             }
             return false;
         }
 
-        public toString(): string
-        {
+        public toString(): string {
             return "Selection: " + this._redoTextRange.toString() + " => " + this._undoTextRange.toString();
         }
 
-        public get redoTextRange(): TextRange
-        {
+        public get redoTextRange(): TextRange {
             return this._redoTextRange;
         }
     }
