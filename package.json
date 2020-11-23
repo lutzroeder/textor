@@ -11,7 +11,7 @@
   "repository": "lutzroeder/textor",
   "devDependencies": {
     "tslint": "6.1.0",
-    "typescript": "3.7.4",
+    "typescript": "3.8.3",
     "uglify-js": "3.7.5"
   }
 }
